@@ -1,0 +1,15 @@
+【标题】
+阳光、WiFi、X光，竟然是一家人？1分钟看懂电磁波
+
+【作品描述】
+晒太阳、连WiFi、拍X光片……它们其实都是电磁波，只是频率不同！
+电场和磁场一个带一个往外跑，不用空气，一秒能绕地球七圈半。
+你还知道哪些电磁波？评论区告诉我👇
+
+#电磁波 #物理 #科普 #涨知识 #光速 #电磁波谱 #ELI5
+
+【封面】
+out/封面.png（内容已放在画面中部，3:4 裁切后仍完整）
+
+【资料来源】
+OpenStax《Plane Electromagnetic Waves》、NASA《Anatomy of an Electromagnetic Wave》《The Electromagnetic Spectrum》、NIST SI 定义常数（c = 299 792 458 m/s）

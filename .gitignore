@@ -9,14 +9,13 @@
 # ---- 可重建的构建产物与缓存 ----
 build/
 dist/
-out/
 .cache/
 cache/
 __pycache__/
 *.pyc
 *.blend1
 *.tmp
-reference/frames/
+**/reference/frames/
 
 # Tesseract：工程文件由 build.sh 生成，.tesseract-work 是中间目录
 *.tsrct
