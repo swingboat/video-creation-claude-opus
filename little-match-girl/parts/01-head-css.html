@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>新年夜的火柴 · 童话补完计划</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#05070f;color:#f4ead8;
+  font-family:"Noto Serif SC","Songti SC","STSong",serif;-webkit-user-select:none;user-select:none;touch-action:none}
+#app{position:fixed;inset:0}
+#app canvas{display:block;width:100%;height:100%;cursor:pointer}
+.hide{opacity:0!important;pointer-events:none!important}
+/* 开场 */
+#intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  background:radial-gradient(ellipse at 50% 60%,rgba(40,30,30,.55),rgba(3,5,12,.94) 70%);transition:opacity 1.6s;z-index:20;text-align:center;padding:24px}
+#intro .series{font-size:13px;letter-spacing:.5em;color:#c9a46a;opacity:.85}
+#intro h1{font-size:clamp(40px,8vw,76px);font-weight:900;letter-spacing:.12em;color:#fff3df;
+  text-shadow:0 0 30px rgba(255,170,90,.45),0 0 2px #fff}
+#intro p.sub{font-size:clamp(14px,2.2vw,18px);color:#d9cbb3;letter-spacing:.15em}
+#intro .note{font-size:12px;color:#8f8a8f;letter-spacing:.2em;margin-top:6px}
+.btn{font-family:inherit;border:0;cursor:pointer;border-radius:999px;padding:14px 38px;font-size:17px;letter-spacing:.25em;
+  color:#3a1d08;background:linear-gradient(180deg,#ffd9a1,#f3a85c);box-shadow:0 0 28px rgba(255,160,80,.55),inset 0 1px 0 #fff6e2;
+  transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-1px) scale(1.03);box-shadow:0 0 42px rgba(255,170,90,.8),inset 0 1px 0 #fff6e2}
+.btn:disabled{cursor:wait;opacity:.55;transform:none;box-shadow:0 0 14px rgba(255,160,80,.25)}
+#intro .btn{margin-top:22px}
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10;transition:opacity 1s}
+#matches{position:absolute;left:22px;top:18px;display:flex;gap:7px}
+#matches i{display:block;width:7px;height:38px;border-radius:2px;background:linear-gradient(180deg,#c3362b 0 22%,#e8cf9c 22%);
+  box-shadow:0 0 8px rgba(255,150,80,.35);transition:opacity .6s,filter .6s}
+#matches i.used{opacity:.22;filter:grayscale(1)}
+#clock{position:absolute;left:50%;top:22px;transform:translateX(-50%);font-size:15px;letter-spacing:.3em;color:#efe3cd;
+  text-shadow:0 0 10px rgba(0,0,0,.8)}
+#mute{position:absolute;right:20px;top:16px;width:36px;height:36px;border-radius:50%;border:0;pointer-events:auto;cursor:pointer;
+  background:rgba(255,255,255,.13);color:#f4ead8;font-size:16px;backdrop-filter:blur(4px)}
+#mute.off{opacity:.45;text-decoration:line-through}
+#hint{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:min(92vw,720px);text-align:center;
+  font-size:14px;letter-spacing:.14em;color:#efe6d6;text-shadow:0 0 8px #000,0 0 16px rgba(0,0,0,.8);transition:opacity .8s}
+#caption{position:absolute;left:50%;bottom:calc(var(--bar) + 10px);transform:translateX(-50%);text-align:center;width:min(94vw,820px);
+  padding:34px 40px 8px;background:radial-gradient(ellipse 50% 100% at 50% 100%,rgba(3,4,10,.6),rgba(3,4,10,.25) 55%,rgba(3,4,10,0) 100%);transition:opacity .9s}
+#caption .t{font-size:13px;letter-spacing:.6em;color:#e9b56a;margin-bottom:8px}
+#caption .l{font-size:clamp(16px,2.4vw,22px);line-height:1.85;letter-spacing:.1em;color:#fff6e8;
+  text-shadow:0 0 12px rgba(0,0,0,.9),0 0 26px rgba(0,0,0,.6)}
+#caption .ln{display:block;opacity:0;animation:capIn 1.3s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes capIn{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+/* 电影黑边 */
+:root{--bar:8.5vh}
+.bar{position:fixed;left:0;right:0;height:var(--bar);background:#020308;z-index:9;pointer-events:none;
+  transition:transform 1.3s cubic-bezier(.6,0,.2,1)}
+.bar.top{top:0;transform:translateY(-100%)} .bar.bot{bottom:0;transform:translateY(100%)}
+body.cine .bar{transform:none}
+body.cine #hint,body.cine #action{opacity:0;pointer-events:none}
+#clock{transition:top 1.3s cubic-bezier(.6,0,.2,1),opacity .6s}
+body.cine #clock{top:calc(var(--bar) / 2 - 9px);opacity:.75}
+#action{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);pointer-events:auto;transition:opacity .5s}
+/* 结局 */
+#ending{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;z-index:30;text-align:center;
+  background:linear-gradient(180deg,rgba(255,242,224,.86) 0%,rgba(255,238,218,.62) 38%,rgba(255,236,214,.12) 62%,rgba(255,236,214,0) 78%);
+  color:#4a2d1c;transition:opacity 2.5s;padding:9vh 24px 24px}
+#ending h2{font-size:clamp(36px,6.4vw,60px);letter-spacing:.2em;font-weight:900;color:#7a3518;text-shadow:0 0 24px #fff}
+#ending p{font-size:clamp(14px,2vw,17px);line-height:1.95;letter-spacing:.12em;max-width:620px;text-shadow:0 0 12px rgba(255,246,232,.9)}
+#ending .btn{margin-top:14px}
+#ending .credit{position:absolute;bottom:22px;font-size:12px;letter-spacing:.2em;color:#5a3a26;padding:4px 14px;border-radius:99px;background:rgba(255,246,232,.55)}
+@media (max-width:640px){
+  #matches{left:14px;top:14px;gap:5px} #matches i{width:6px;height:30px}
+  #hint{font-size:12px;bottom:18px} #action{bottom:58px} .btn{padding:12px 28px;font-size:15px}
+  :root{--bar:7vh} #caption{padding:26px 14px 6px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="bar top"></div><div class="bar bot"></div>
+<div id="hud" class="hide">
+  <div id="matches" aria-label="剩余火柴"><i></i><i></i><i></i><i></i><i></i></div>
+  <div id="clock">23:00</div>
+  <button id="mute" title="声音 (M)">♪</button>
+  <div id="caption" class="hide"><div class="t"></div><div class="l"></div></div>
+  <button id="action" class="btn hide"></button>
+  <div id="hint"></div>
+</div>
+<div id="intro">
+  <div class="series">童话补完计划 · 第一夜</div>
+  <h1>新年夜的火柴</h1>
+  <p class="sub">这一回，火光里的一切都会留下来。</p>
+  <button id="start" class="btn" disabled>正在铺雪……</button>
+  <div class="note">建议打开声音 · 点击地面行走 · 拖动旋转视角 · 滚轮缩放</div>
+</div>
+<div id="ending" class="hide">
+  <h2>新年快乐</h2>
+  <p>天亮了。运河上的冰在晨光里闪闪发亮。<br>那个小女孩没有冻僵在墙角——<br>她和奶奶、还有一只白鹅，一起过了新年。</p>
+  <button id="again" class="btn">再走一遍</button>
+  <div class="credit">原著：安徒生《卖火柴的小女孩》（1845）· 童话补完计划 第一夜</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';

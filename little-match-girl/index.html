@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>新年夜的火柴 · 童话补完计划</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#05070f;color:#f4ead8;
+  font-family:"Noto Serif SC","Songti SC","STSong",serif;-webkit-user-select:none;user-select:none;touch-action:none}
+#app{position:fixed;inset:0}
+#app canvas{display:block;width:100%;height:100%;cursor:pointer}
+.hide{opacity:0!important;pointer-events:none!important}
+/* 开场 */
+#intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  background:radial-gradient(ellipse at 50% 60%,rgba(40,30,30,.55),rgba(3,5,12,.94) 70%);transition:opacity 1.6s;z-index:20;text-align:center;padding:24px}
+#intro .series{font-size:13px;letter-spacing:.5em;color:#c9a46a;opacity:.85}
+#intro h1{font-size:clamp(40px,8vw,76px);font-weight:900;letter-spacing:.12em;color:#fff3df;
+  text-shadow:0 0 30px rgba(255,170,90,.45),0 0 2px #fff}
+#intro p.sub{font-size:clamp(14px,2.2vw,18px);color:#d9cbb3;letter-spacing:.15em}
+#intro .note{font-size:12px;color:#8f8a8f;letter-spacing:.2em;margin-top:6px}
+.btn{font-family:inherit;border:0;cursor:pointer;border-radius:999px;padding:14px 38px;font-size:17px;letter-spacing:.25em;
+  color:#3a1d08;background:linear-gradient(180deg,#ffd9a1,#f3a85c);box-shadow:0 0 28px rgba(255,160,80,.55),inset 0 1px 0 #fff6e2;
+  transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-1px) scale(1.03);box-shadow:0 0 42px rgba(255,170,90,.8),inset 0 1px 0 #fff6e2}
+.btn:disabled{cursor:wait;opacity:.55;transform:none;box-shadow:0 0 14px rgba(255,160,80,.25)}
+#intro .btn{margin-top:22px}
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10;transition:opacity 1s}
+#matches{position:absolute;left:22px;top:18px;display:flex;gap:7px}
+#matches i{display:block;width:7px;height:38px;border-radius:2px;background:linear-gradient(180deg,#c3362b 0 22%,#e8cf9c 22%);
+  box-shadow:0 0 8px rgba(255,150,80,.35);transition:opacity .6s,filter .6s}
+#matches i.used{opacity:.22;filter:grayscale(1)}
+#clock{position:absolute;left:50%;top:22px;transform:translateX(-50%);font-size:15px;letter-spacing:.3em;color:#efe3cd;
+  text-shadow:0 0 10px rgba(0,0,0,.8)}
+#mute{position:absolute;right:20px;top:16px;width:36px;height:36px;border-radius:50%;border:0;pointer-events:auto;cursor:pointer;
+  background:rgba(255,255,255,.13);color:#f4ead8;font-size:16px;backdrop-filter:blur(4px)}
+#mute.off{opacity:.45;text-decoration:line-through}
+#hint{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:min(92vw,720px);text-align:center;
+  font-size:14px;letter-spacing:.14em;color:#efe6d6;text-shadow:0 0 8px #000,0 0 16px rgba(0,0,0,.8);transition:opacity .8s}
+#caption{position:absolute;left:50%;bottom:calc(var(--bar) + 10px);transform:translateX(-50%);text-align:center;width:min(94vw,820px);
+  padding:34px 40px 8px;background:radial-gradient(ellipse 50% 100% at 50% 100%,rgba(3,4,10,.6),rgba(3,4,10,.25) 55%,rgba(3,4,10,0) 100%);transition:opacity .9s}
+#caption .t{font-size:13px;letter-spacing:.6em;color:#e9b56a;margin-bottom:8px}
+#caption .l{font-size:clamp(16px,2.4vw,22px);line-height:1.85;letter-spacing:.1em;color:#fff6e8;
+  text-shadow:0 0 12px rgba(0,0,0,.9),0 0 26px rgba(0,0,0,.6)}
+#caption .ln{display:block;opacity:0;animation:capIn 1.3s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes capIn{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+/* 电影黑边 */
+:root{--bar:8.5vh}
+.bar{position:fixed;left:0;right:0;height:var(--bar);background:#020308;z-index:9;pointer-events:none;
+  transition:transform 1.3s cubic-bezier(.6,0,.2,1)}
+.bar.top{top:0;transform:translateY(-100%)} .bar.bot{bottom:0;transform:translateY(100%)}
+body.cine .bar{transform:none}
+body.cine #hint,body.cine #action{opacity:0;pointer-events:none}
+#clock{transition:top 1.3s cubic-bezier(.6,0,.2,1),opacity .6s}
+body.cine #clock{top:calc(var(--bar) / 2 - 9px);opacity:.75}
+#action{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);pointer-events:auto;transition:opacity .5s}
+/* 结局 */
+#ending{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;z-index:30;text-align:center;
+  background:linear-gradient(180deg,rgba(255,242,224,.86) 0%,rgba(255,238,218,.62) 38%,rgba(255,236,214,.12) 62%,rgba(255,236,214,0) 78%);
+  color:#4a2d1c;transition:opacity 2.5s;padding:9vh 24px 24px}
+#ending h2{font-size:clamp(36px,6.4vw,60px);letter-spacing:.2em;font-weight:900;color:#7a3518;text-shadow:0 0 24px #fff}
+#ending p{font-size:clamp(14px,2vw,17px);line-height:1.95;letter-spacing:.12em;max-width:620px;text-shadow:0 0 12px rgba(255,246,232,.9)}
+#ending .btn{margin-top:14px}
+#ending .credit{position:absolute;bottom:22px;font-size:12px;letter-spacing:.2em;color:#5a3a26;padding:4px 14px;border-radius:99px;background:rgba(255,246,232,.55)}
+@media (max-width:640px){
+  #matches{left:14px;top:14px;gap:5px} #matches i{width:6px;height:30px}
+  #hint{font-size:12px;bottom:18px} #action{bottom:58px} .btn{padding:12px 28px;font-size:15px}
+  :root{--bar:7vh} #caption{padding:26px 14px 6px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="bar top"></div><div class="bar bot"></div>
+<div id="hud" class="hide">
+  <div id="matches" aria-label="剩余火柴"><i></i><i></i><i></i><i></i><i></i></div>
+  <div id="clock">23:00</div>
+  <button id="mute" title="声音 (M)">♪</button>
+  <div id="caption" class="hide"><div class="t"></div><div class="l"></div></div>
+  <button id="action" class="btn hide"></button>
+  <div id="hint"></div>
+</div>
+<div id="intro">
+  <div class="series">童话补完计划 · 第一夜</div>
+  <h1>新年夜的火柴</h1>
+  <p class="sub">这一回，火光里的一切都会留下来。</p>
+  <button id="start" class="btn" disabled>正在铺雪……</button>
+  <div class="note">建议打开声音 · 点击地面行走 · 拖动旋转视角 · 滚轮缩放</div>
+</div>
+<div id="ending" class="hide">
+  <h2>新年快乐</h2>
+  <p>天亮了。运河上的冰在晨光里闪闪发亮。<br>那个小女孩没有冻僵在墙角——<br>她和奶奶、还有一只白鹅，一起过了新年。</p>
+  <button id="again" class="btn">再走一遍</button>
+  <div class="credit">原著：安徒生《卖火柴的小女孩》（1845）· 童话补完计划 第一夜</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+// ===== 02-core.js：命名空间、渲染器、工具、纹理、材质、碰撞、输入、光源池 =====
+if (!window.THREE) {
+  document.getElementById('start').textContent = '加载失败，请检查网络后刷新';
+  throw new Error('three.js 加载失败');
+}
+const T = THREE;
+const M = window.M = { T, time: 0, dt: 0, quality: 1 };
+
+M.renderer = new T.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+M.renderer.toneMapping = T.NoToneMapping;
+M.renderer.shadowMap.enabled = true;
+M.renderer.shadowMap.type = T.PCFSoftShadowMap;
+M.pixelScale = 1;
+M.setPixelRatio = () => M.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75) * M.pixelScale);
+M.setPixelRatio();
+M.renderer.setSize(innerWidth, innerHeight);
+document.getElementById('app').appendChild(M.renderer.domElement);
+M.scene = new T.Scene();
+M.camera = new T.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 400);
+M.scene.fog = new T.FogExp2(0x1b2440, 0.022);
+M.scene.fog.color.convertSRGBToLinear();
+
+// ---- 帧回调 ----
+M._frames = [];
+M.onFrame = (fn, order = 50) => { M._frames.push({ fn, order }); M._frames.sort((a, b) => a.order - b.order); };
+
+// ---- 数学工具 ----
+M.clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+M.lerp = (a, b, t) => a + (b - a) * t;
+M.smooth = (a, b, x) => { const t = M.clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+M.damp = (cur, target, rate, dt) => M.lerp(cur, target, 1 - Math.exp(-rate * dt));
+M.col = hex => new T.Color(hex).convertSRGBToLinear();
+M.rand = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const _h2 = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+M.noise2 = (x, y) => {
+  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+  const ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
+  const a = _h2(ix, iy), b = _h2(ix + 1, iy), c = _h2(ix, iy + 1), d = _h2(ix + 1, iy + 1);
+  return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+};
+M.fbm2 = (x, y, o = 4) => { let s = 0, a = 0.5, f = 1; for (let i = 0; i < o; i++) { s += a * M.noise2(x * f, y * f); f *= 2; a *= 0.5; } return s; };
+// 周期为 p 的值噪声，用于可平铺贴图
+M.noiseP = (x, y, p) => {
+  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy, w = v => ((v % p) + p) % p;
+  const ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
+  const a = _h2(w(ix), w(iy)), b = _h2(w(ix + 1), w(iy)), c = _h2(w(ix), w(iy + 1)), d = _h2(w(ix + 1), w(iy + 1));
+  return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+};
+M.glslNoise = `
+float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
+float noise(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),u.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x), u.y); }
+float fbm(vec2 p){ float s=0., a=.5; for(int i=0;i<5;i++){ s+=a*noise(p); p=p*2.03+17.1; a*=.5; } return s; }
+`;
+
+// ---- Canvas 纹理工厂 ----
+M.tex = {};
+const _texCache = {};
+function canvasTex(name, size, draw, opts = {}) {
+  if (_texCache[name]) return _texCache[name];
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d'); draw(g, size);
+  const t = new T.CanvasTexture(c);
+  if (opts.srgb !== false) t.encoding = T.sRGBEncoding;
+  t.wrapS = t.wrapT = opts.clamp ? T.ClampToEdgeWrapping : T.RepeatWrapping;
+  t.anisotropy = 4;
+  return (_texCache[name] = t);
+}
+M.canvasTex = canvasTex;
+M.tex.cobble = () => canvasTex('cobble', 1024, (g, s) => {
+  const r = M.rand(7); g.fillStyle = '#1c1c22'; g.fillRect(0, 0, s, s);
+  const rows = 16, rh = s / rows;
+  for (let y = 0; y < rows; y++) {
+    let x = (y % 2) * rh * 0.5 - rh;
+    while (x < s) {
+      const w = rh * (0.75 + r() * 0.55), l = 34 + r() * 18, warm = r() < 0.55, hue = warm ? 22 + r() * 18 : 215 + r() * 15;
+      const x0 = x + 2.5 + r() * 1.5, y0 = y * rh + 2.5 + r() * 1.5, ww = w - 5 - r() * 2, hh = rh - 5 - r() * 2;
+      const cx = x0 + ww * (0.42 + r() * 0.12), cy = y0 + hh * 0.4;
+      const gr = g.createRadialGradient(cx, cy, 2, cx, cy, Math.max(ww, hh) * 0.72);
+      gr.addColorStop(0, `hsl(${hue},${5 + r() * 6}%,${l + 9}%)`);
+      gr.addColorStop(0.65, `hsl(${hue},${4 + r() * 6}%,${l}%)`);
+      gr.addColorStop(1, `hsl(${hue},6%,${l - 14}%)`);
+      g.fillStyle = gr; g.beginPath();
+      g.roundRect ? g.roundRect(x0, y0, ww, hh, 9 + r() * 5) : g.rect(x0, y0, ww, hh); g.fill();
+      g.fillStyle = 'rgba(255,250,240,0.07)'; g.beginPath(); g.ellipse(cx, cy - hh * 0.12, ww * 0.28, hh * 0.13, 0, 0, Math.PI * 2); g.fill();
+      x += w;
+    }
+  }
+  for (let i = 0; i < 14000; i++) { g.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,255,255'},${r() * 0.06})`; g.fillRect(r() * s, r() * s, 1 + r() * 2, 1 + r() * 2); }
+  for (let i = 0; i < 260; i++) { g.fillStyle = `rgba(20,18,22,${0.3 + r() * 0.4})`; g.beginPath(); g.arc(r() * s, r() * s, 1 + r() * 2.5, 0, Math.PI * 2); g.fill(); }
+});
+M.tex.plaster = () => canvasTex('plaster', 512, (g, s) => {
+  const r = M.rand(11), img = g.createImageData(s, s), d = img.data;
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++) {
+    const u = x / s, v = y / s;
+    const n = M.noiseP(u * 4, v * 4, 4) * 0.55 + M.noiseP(u * 11, v * 11, 11) * 0.3 + M.noiseP(u * 37, v * 37, 37) * 0.15;
+    const streak = Math.max(0, M.noiseP(u * 48, 0.5, 48) - 0.55) * 2.2 * (1 - v) ** 1.5;
+    const damp = Math.max(0, (v - 0.8) / 0.2) ** 1.6 * (0.6 + 0.4 * M.noiseP(u * 9, v * 3, 9));
+    let k = 0.86 + (n - 0.5) * 0.22 - streak * 0.12 - damp * 0.3 + (r() - 0.5) * 0.05;
+    k = Math.max(0, Math.min(1, k)); const i = (y * s + x) * 4;
+    d[i] = 255 * k; d[i + 1] = 252 * k; d[i + 2] = 246 * k; d[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+});
+M.tex.planks = () => canvasTex('planks', 256, (g, s) => {
+  const r = M.rand(31); g.fillStyle = '#fff'; g.fillRect(0, 0, s, s);
+  const n = 8, ph = s / n;
+  for (let i = 0; i < n; i++) {
+    const k = 0.82 + r() * 0.18; g.fillStyle = `rgba(${255 * k | 0},${246 * k | 0},${232 * k | 0},1)`; g.fillRect(0, i * ph, s, ph);
+    for (let y = 0; y < ph; y += 2) { g.fillStyle = `rgba(70,40,18,${0.05 + 0.12 * M.noise2(y * 0.2 + i * 7, i)})`; g.fillRect(0, i * ph + y, s, 1); }
+    g.fillStyle = 'rgba(25,12,5,0.65)'; g.fillRect(0, i * ph, s, 2);
+    for (let x = 12 + r() * 20; x < s; x += 40 + r() * 30) { g.fillStyle = 'rgba(30,20,15,0.6)'; g.fillRect(x, i * ph + ph / 2 - 1, 2, 2); }
+  }
+});
+M.tex.wood = () => canvasTex('wood', 256, (g, s) => {
+  const r = M.rand(3); g.fillStyle = '#fff'; g.fillRect(0, 0, s, s);
+  for (let y = 0; y < s; y += 2) { g.fillStyle = `rgba(60,35,15,${0.08 + 0.18 * M.noise2(y * 0.05, 0.5) + r() * 0.05})`; g.fillRect(0, y, s, 1.5); }
+  for (let y = 0; y < s; y += 32) { g.fillStyle = 'rgba(20,10,5,0.5)'; g.fillRect(0, y, s, 2); }
+});
+M.tex.stone = () => canvasTex('stone', 512, (g, s) => {
+  const r = M.rand(5); g.fillStyle = '#222'; g.fillRect(0, 0, s, s);
+  const bh = s / 8;
+  for (let y = 0; y < 8; y++) for (let x = -1; x < 5; x++) {
+    const ox = (y % 2) * s / 8; g.fillStyle = `hsl(25,${8 + r() * 8}%,${38 + r() * 18}%)`;
+    g.fillRect(x * s / 4 + ox + 3, y * bh + 3, s / 4 - 6, bh - 6);
+  }
+});
+M.tex.soft = () => canvasTex('soft', 128, (g, s) => {
+  const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,0.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, s, s);
+}, { clamp: true, srgb: false });
+M.tex.frost = () => canvasTex('frost', 1024, (g, s) => {
+  const r = M.rand(21); g.fillStyle = '#000'; g.fillRect(0, 0, s, s);
+  g.strokeStyle = 'rgba(255,255,255,0.32)'; g.lineCap = 'round';
+  const branch = (x, y, a, len, w, d) => {
+    if (d > 6 || len < 4) return;
+    const x2 = x + Math.cos(a) * len, y2 = y + Math.sin(a) * len;
+    g.lineWidth = w; g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke();
+    branch(x2, y2, a + (r() - .5) * .5, len * .8, w * .8, d + 1);
+    if (r() < .7) branch(x2, y2, a + (r() < .5 ? 1 : -1) * (.5 + r() * .6), len * .55, w * .6, d + 1);
+  };
+  for (let i = 0; i < 260; i++) {
+    const e = r() * 4 | 0, t = r() * s, x = e === 0 ? 0 : e === 1 ? s : t, y = e === 2 ? 0 : e === 3 ? s : (e < 2 ? t : t);
+    const a = Math.atan2(s / 2 - y, s / 2 - x) + (r() - .5) * 1.2;
+    branch(e < 2 ? x : t, e < 2 ? t : y, a, 18 + r() * 40, 2.2, 0);
+  }
+  g.filter = 'blur(2.5px)'; g.drawImage(g.canvas, 0, 0);
+}, { clamp: true, srgb: false });
+
+// ---- 材质 ----
+M.mat = {};
+const _matCache = {};
+M.mat.std = (color, rough = 0.85, opts = {}) => {
+  const key = color + '|' + rough + '|' + (opts.map ? opts.map.uuid : '') + (opts.key || '');
+  if (_matCache[key] && !opts.unique) return _matCache[key];
+  const m = new T.MeshStandardMaterial({ color: M.col(color), roughness: rough, metalness: opts.metal || 0, map: opts.map || null,
+    flatShading: !!opts.flat, side: opts.side || T.FrontSide });
+  if (opts.emissive) { m.emissive = M.col(opts.emissive); m.emissiveIntensity = opts.ei ?? 1; }
+  return opts.unique ? m : (_matCache[key] = m);
+};
+M.mat.emissive = (color, intensity = 1) => new T.MeshBasicMaterial({ color: M.col(color).multiplyScalar(intensity) });
+M.mat.snow = M.mat.std('#e4ebf7', 0.62);
+
+// ---- 可行走区域与碰撞 ----
+M.colliders = [];
+M.walkable = (x, z) =>
+  (x >= -3.5 && x <= 5.6 && z >= -44 && z <= 18) ||
+  (x >= -12 && x <= 22 && z >= -64 && z <= -44) ||
+  (x >= 5.6 && x <= 14.4 && z >= -21.3 && z <= -18.7) ||
+  (x >= 14.4 && x <= 16 && z >= -44 && z <= 28);
+M.groundY = () => 0;
+M.collide = (p, r) => {
+  for (const c of M.colliders) {
+    const dx = p.x - c.x, dz = p.z - c.z, d = Math.hypot(dx, dz), m = c.r + r;
+    if (d < m && d > 1e-4) { p.x = c.x + dx / d * m; p.z = c.z + dz / d * m; }
+  }
+};
+
+// ---- 输入：点击 / 拖动 / 缩放 ----
+M.input = { _tap: [], _drag: [], _zoom: [] };
+M.input.onTap = f => M.input._tap.push(f);
+M.input.onDrag = f => M.input._drag.push(f);
+M.input.onZoom = f => M.input._zoom.push(f);
+(() => {
+  const el = M.renderer.domElement, pts = new Map();
+  let down = null, pinch = 0;
+  el.addEventListener('pointerdown', e => {
+    el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size === 1) down = { x: e.clientX, y: e.clientY, t: performance.now(), moved: 0 };
+    if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); down = null; }
+  });
+  el.addEventListener('pointermove', e => {
+    const p = pts.get(e.pointerId); if (!p) return;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+    if (pts.size === 2) {
+      const [a, b] = [...pts.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+      M.input._zoom.forEach(f => f((pinch - d) * 0.02)); pinch = d; return;
+    }
+    if (down) { down.moved += Math.abs(dx) + Math.abs(dy); if (down.moved > 6) M.input._drag.forEach(f => f(dx, dy)); }
+  });
+  const up = e => {
+    if (down && pts.size === 1 && down.moved <= 6 && performance.now() - down.t < 400)
+      M.input._tap.forEach(f => f(e.clientX, e.clientY));
+    pts.delete(e.pointerId); if (pts.size === 0) down = null;
+  };
+  el.addEventListener('pointerup', up); el.addEventListener('pointercancel', e => { pts.delete(e.pointerId); down = null; });
+  el.addEventListener('wheel', e => { e.preventDefault(); M.input._zoom.forEach(f => f(e.deltaY * 0.01)); }, { passive: false });
+})();
+
+// ---- 光源：地面假光斑 + 点光池 + 暖源 ----
+M.lights = { _pool: [], pools: [] };
+M.lights.pool = (x, z, color = '#ffb26b', r = 4.5, intensity = 1) => {
+  const m = new T.Mesh(new T.PlaneGeometry(r * 2, r * 2), new T.MeshBasicMaterial({
+    map: M.tex.soft(), color: M.col(color).multiplyScalar(intensity * 0.28), transparent: true,
+    blending: T.AdditiveBlending, depthWrite: false, fog: true }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x, 0.025, z); m.renderOrder = 2;
+  m.userData.base = intensity; M.scene.add(m); M.lights.pools.push(m); return m;
+};
+for (let i = 0; i < 4; i++) { const l = new T.PointLight(0xffffff, 0, 8, 2); l.userData.free = true; M.scene.add(l); M.lights._pool.push(l); }
+M.lights.point = (color, intensity, dist = 8) => {
+  const l = M.lights._pool.find(l => l.userData.free); if (!l) return null;
+  l.userData.free = false; l.color.copy(M.col(color)); l.intensity = intensity; l.distance = dist; return l;
+};
+M.lights.release = l => { if (l) { l.intensity = 0; l.userData.free = true; } };
+M.warm = { list: [] };
+M.warm.add = w => (M.warm.list.push(w), w);
+M.warm.at = (x, z) => {
+  let s = 0; for (const w of M.warm.list) { const d = Math.hypot(x - w.x, z - w.z); s += w.power * M.smooth(w.r, w.r * 0.3, d); }
+  return M.clamp(s, 0, 1);
+};
+// ===== 03-post.js：后期管线（线性 HDR → bloom + 景深 + 调色 + 霜冻 + ACES）=====
+(() => {
+  const R = M.renderer;
+  const hdr = { type: T.HalfFloatType, minFilter: T.LinearFilter, magFilter: T.LinearFilter, depthBuffer: false };
+  const rtScene = new T.WebGLRenderTarget(4, 4, { type: T.HalfFloatType, minFilter: T.LinearFilter, magFilter: T.LinearFilter });
+  rtScene.depthTexture = new T.DepthTexture(4, 4); rtScene.depthTexture.type = T.UnsignedIntType;
+  const rtA = new T.WebGLRenderTarget(4, 4, hdr), rtB = new T.WebGLRenderTarget(4, 4, hdr);
+  const rtC = new T.WebGLRenderTarget(4, 4, hdr), rtD = new T.WebGLRenderTarget(4, 4, hdr);
+  const rtE = new T.WebGLRenderTarget(4, 4, hdr), rtF = new T.WebGLRenderTarget(4, 4, hdr);
+
+  const geo = new T.BufferGeometry();
+  geo.setAttribute('position', new T.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
+  const quad = new T.Mesh(geo); quad.frustumCulled = false;
+  const pScene = new T.Scene(); pScene.add(quad);
+  const pCam = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const VS = `varying vec2 vUv; void main(){ vUv = position.xy*.5+.5; gl_Position = vec4(position.xy,0.,1.); }`;
+  const mk = (fs, uniforms) => new T.ShaderMaterial({ vertexShader: VS, fragmentShader: fs, uniforms, depthTest: false, depthWrite: false });
+
+  const matDown = mk(`
+    uniform sampler2D tSrc; uniform vec2 uTexel; uniform float uThresh; varying vec2 vUv;
+    void main(){
+      vec3 c = texture2D(tSrc, vUv+uTexel*vec2(-.5,-.5)).rgb + texture2D(tSrc, vUv+uTexel*vec2(.5,-.5)).rgb
+             + texture2D(tSrc, vUv+uTexel*vec2(-.5,.5)).rgb + texture2D(tSrc, vUv+uTexel*vec2(.5,.5)).rgb;
+      c *= .25;
+      if (uThresh > 0.) { float l = max(c.r, max(c.g, c.b)); float k = smoothstep(uThresh-.5, uThresh+.5, l); c *= k; }
+      gl_FragColor = vec4(min(c, vec3(40.)), 1.);
+    }`, { tSrc: { value: null }, uTexel: { value: new T.Vector2() }, uThresh: { value: 0 } });
+
+  const matBlur = mk(`
+    uniform sampler2D tSrc; uniform vec2 uDir; varying vec2 vUv;
+    void main(){
+      vec3 c = texture2D(tSrc, vUv).rgb * .227027;
+      c += texture2D(tSrc, vUv + uDir*1.3846).rgb * .316216; c += texture2D(tSrc, vUv - uDir*1.3846).rgb * .316216;
+      c += texture2D(tSrc, vUv + uDir*3.2308).rgb * .070270; c += texture2D(tSrc, vUv - uDir*3.2308).rgb * .070270;
+      gl_FragColor = vec4(c, 1.);
+    }`, { tSrc: { value: null }, uDir: { value: new T.Vector2() } });
+
+  const U = {
+    tScene: { value: rtScene.texture }, tDepth: { value: rtScene.depthTexture },
+    tBloomA: { value: rtA.texture }, tBloomC: { value: rtC.texture }, tDof: { value: rtE.texture },
+    tFrost: { value: M.tex.frost() },
+    uCold: { value: 0.3 }, uWarm: { value: 0 }, uDawn: { value: 0 }, uFocus: { value: 9 }, uWhite: { value: 0 },
+    uNear: { value: 0.1 }, uFar: { value: 400 }, uTime: { value: 0 }, uExposure: { value: 1.15 },
+    uAspect: { value: 1 }, uLowQ: { value: 0 },
+  };
+  const matComp = mk(`
+    uniform sampler2D tScene, tDepth, tBloomA, tBloomC, tDof, tFrost;
+    uniform float uCold, uWarm, uDawn, uFocus, uWhite, uNear, uFar, uTime, uExposure, uAspect, uLowQ;
+    varying vec2 vUv;
+    float hash12(vec2 p){ vec3 p3 = fract(vec3(p.xyx)*.1031); p3 += dot(p3, p3.yzx+33.33); return fract((p3.x+p3.y)*p3.z); }
+    vec3 aces(vec3 x){ return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14), 0., 1.); }
+    void main(){
+      vec3 col = texture2D(tScene, vUv).rgb;
+      float d = texture2D(tDepth, vUv).r;
+      float z = (2.*uNear*uFar) / (uFar+uNear - (d*2.-1.)*(uFar-uNear));
+      if (uLowQ < .5) {
+        float coc = smoothstep(uFocus+3., uFocus+28., z)*.9 + smoothstep(uFocus-2.5, .4, z)*.6;
+        col = mix(col, texture2D(tDof, vUv).rgb, clamp(coc, 0., 1.));
+      }
+      col += texture2D(tBloomA, vUv).rgb * .5 + (uLowQ < .5 ? texture2D(tBloomC, vUv).rgb * .8 : vec3(0.));
+      // 冷暖调色
+      float l = dot(col, vec3(.2126,.7152,.0722));
+      col = mix(col, vec3(l)*vec3(.78,.88,1.15), uCold*.35);
+      col *= 1. + uWarm*vec3(.35,.18,.02);
+      col *= 1. + uDawn*.25;
+      col = aces(col * uExposure);
+      // 霜冻边缘
+      vec2 q = (vUv-.5)*vec2(uAspect, 1.);
+      float r = length(q) / length(vec2(uAspect, 1.)*.5);
+      float fr = texture2D(tFrost, vUv).r;
+      float edge = smoothstep(1.05 - .55*uCold, 1.25 - .35*uCold, r + fr*.18 + (hash12(floor(vUv*180.))-.5)*.03);
+      col = mix(col, vec3(.84,.9,.98), edge*(.55 + .45*fr) * (1.-uDawn*.8));
+      // 暗角、白场；颗粒加在 gamma 之后（否则暗部被 gamma 放大成强烈闪烁），暗部更弱，24 Hz 更新
+      col *= mix(1., smoothstep(1.25, .35, r), .55 * (1.-uDawn*.6));
+      col = pow(max(col, 0.), vec3(1./2.2));
+      float gl = dot(col, vec3(.2126,.7152,.0722));
+      col += (hash12(vUv*1000. + fract(floor(uTime*24.)/24.)*137.) - .5) * .022 * mix(.25, 1., smoothstep(.04, .35, gl));
+      col = mix(col, vec3(1., .97, .93), uWhite);
+      gl_FragColor = vec4(col, 1.);
+    }`, U);
+
+  const pass = (mat, target) => { quad.material = mat; R.setRenderTarget(target); R.render(pScene, pCam); };
+  const blur = (a, b, w, h, scale = 1) => {
+    matBlur.uniforms.tSrc.value = a.texture; matBlur.uniforms.uDir.value.set(scale / w, 0); pass(matBlur, b);
+    matBlur.uniforms.tSrc.value = b.texture; matBlur.uniforms.uDir.value.set(0, scale / h); pass(matBlur, a);
+  };
+  const size = new T.Vector2();
+  M.post = { uniforms: U };
+  M.post.resize = () => {
+    R.getDrawingBufferSize(size);
+    const w = Math.max(4, size.x | 0), h = Math.max(4, size.y | 0);
+    rtScene.setSize(w, h);
+    rtA.setSize(w >> 1, h >> 1); rtB.setSize(w >> 1, h >> 1); rtE.setSize(w >> 1, h >> 1); rtF.setSize(w >> 1, h >> 1);
+    rtC.setSize(w >> 2, h >> 2); rtD.setSize(w >> 2, h >> 2);
+    U.uAspect.value = w / h;
+  };
+  M.post.render = () => {
+    const cam = M.camera, lowQ = M.quality < 0.35;
+    U.uNear.value = cam.near; U.uFar.value = cam.far; U.uTime.value = M.time; U.uLowQ.value = lowQ ? 1 : 0;
+    R.setRenderTarget(rtScene); R.render(M.scene, cam);
+    const w2 = rtA.width, h2 = rtA.height;
+    matDown.uniforms.tSrc.value = rtScene.texture; matDown.uniforms.uTexel.value.set(1 / rtScene.width, 1 / rtScene.height);
+    matDown.uniforms.uThresh.value = 1.0; pass(matDown, rtA);
+    blur(rtA, rtB, w2, h2);
+    if (!lowQ) {
+      matDown.uniforms.tSrc.value = rtA.texture; matDown.uniforms.uTexel.value.set(1 / w2, 1 / h2);
+      matDown.uniforms.uThresh.value = 0; pass(matDown, rtC);
+      blur(rtC, rtD, rtC.width, rtC.height, 1.5); blur(rtC, rtD, rtC.width, rtC.height, 2.5);
+      matDown.uniforms.tSrc.value = rtScene.texture; matDown.uniforms.uTexel.value.set(1 / rtScene.width, 1 / rtScene.height);
+      pass(matDown, rtE);
+      blur(rtE, rtF, w2, h2, 1.5); blur(rtE, rtF, w2, h2, 2.5);
+    }
+    pass(matComp, null);
+  };
+  M.post.resize();
+})();
+// ===== 04-sky-ground.js：天空、远景、地面积雪、雪堆、降雪、脚印 =====
+(() => {
+  // ---- 天空穹顶 ----
+  const skyU = { uTime: { value: 0 }, uDawn: { value: 0 } };
+  const sky = new T.Mesh(new T.SphereGeometry(300, 48, 24), new T.ShaderMaterial({
+    side: T.BackSide, depthWrite: false, fog: false, uniforms: skyU,
+    vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: M.glslNoise + `
+      uniform float uTime, uDawn; varying vec3 vDir;
+      vec3 lin(vec3 c){ return pow(c, vec3(2.2)); }
+      void main(){
+        vec3 d = normalize(vDir); float h = clamp(d.y, -.2, 1.);
+        vec3 night = mix(lin(vec3(.17,.23,.4)), lin(vec3(.027,.043,.11)), pow(max(h,0.), .55));
+        vec3 dawn = mix(lin(vec3(.95,.79,.63)), lin(vec3(.56,.7,.88)), pow(max(h,0.), .6));
+        vec3 c = mix(night, dawn, uDawn);
+        float az = atan(d.x, -d.z);
+        float wave = .26 + .07*sin(az*5. + uTime*.15) + .04*sin(az*11. - uTime*.23);
+        float curtain = exp(-pow((h - wave)/.11, 2.)) * smoothstep(-.4, .5, az) * smoothstep(1.9, .7, az);
+        curtain *= .55 + .45*noise(vec2(az*18., uTime*.3));
+        c += lin(vec3(.12,.62,.5)) * curtain * .35 * (1.-uDawn);
+        vec2 g = vec2(az*90., asin(clamp(d.y,-1.,1.))*90.);
+        vec2 cell = floor(g); float s = hash(cell);
+        if (s > .975 && h > .05) {
+          float tw = .6 + .4*sin(uTime*(1.5+s*3.) + s*40.);
+          float r = length(fract(g)-.5);
+          c += vec3(smoothstep(.22, .0, r)) * tw * (s-.975)*60. * (1.-uDawn) * smoothstep(.05,.25,h);
+        }
+        gl_FragColor = vec4(c, 1.);
+      }`
+  }));
+  sky.renderOrder = -10; M.scene.add(sky);
+  M.sky = { mesh: sky, uniforms: skyU };
+
+  // ---- 远景剪影：画在一圈圆柱内壁 ----
+  const sil = M.canvasTex('skyline', 2048, (g, s) => {
+    const r = M.rand(99); g.clearRect(0, 0, s, s);
+    let x = 0;
+    while (x < s) {
+      const w = 30 + r() * 70, h = s * (0.18 + r() * 0.22), base = s;
+      g.fillStyle = `rgb(${18 + r() * 6},${24 + r() * 8},${48 + r() * 12})`;
+      g.fillRect(x, base - h, w, h);
+      g.beginPath(); g.moveTo(x - 2, base - h); g.lineTo(x + w / 2, base - h - 20 - r() * 40); g.lineTo(x + w + 2, base - h); g.fill();
+      if (r() < 0.12) { g.beginPath(); g.moveTo(x + w * .4, base - h); g.lineTo(x + w * .5, base - h - 160 - r() * 140); g.lineTo(x + w * .6, base - h); g.fill(); }
+      for (let i = 0; i < 6; i++) if (r() < 0.35) { g.fillStyle = `rgba(255,${170 + r() * 50},90,${0.5 + r() * 0.4})`; g.fillRect(x + 5 + r() * (w - 12), base - h + 10 + r() * (h - 30), 4, 6); }
+      x += w + r() * 6;
+    }
+  }, { clamp: false });
+  sil.wrapT = T.ClampToEdgeWrapping; sil.repeat.set(3, 1);
+  const ring = new T.Mesh(new T.CylinderGeometry(150, 150, 70, 64, 1, true), new T.MeshBasicMaterial({
+    map: sil, transparent: true, side: T.BackSide, fog: false, depthWrite: false, color: M.col('#8f9ab8') }));
+  ring.position.y = 22; ring.renderOrder = -9; M.scene.add(ring);
+  M.sky.ring = ring;
+
+  // ---- 地面：石板 + 世界坐标积雪 ----
+  const cobble = M.tex.cobble();
+  const groundMat = new T.MeshStandardMaterial({ map: cobble, color: M.col('#a9a6a6'), roughness: 0.82, bumpMap: cobble, bumpScale: 0.035 });
+  groundMat.onBeforeCompile = sh => {
+    sh.vertexShader = 'varying vec3 vWP;\n' + sh.vertexShader.replace('#include <worldpos_vertex>',
+      '#include <worldpos_vertex>\n vWP = (modelMatrix*vec4(transformed,1.)).xyz;');
+    sh.fragmentShader = 'varying vec3 vWP;\n' + M.glslNoise + sh.fragmentShader.replace('#include <map_fragment>', `
+      #include <map_fragment>
+      float macro = fbm(vWP.xz*.045), macro2 = fbm(vWP.xz*.21 + 7.3);
+      diffuseColor.rgb *= .88 + .24*macro;
+      diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb*vec3(1.06,.98,.9), smoothstep(.45,.7,macro2));
+      float edge = max(max(smoothstep(1.6,0.,abs(vWP.x+4.)), smoothstep(1.,0.,abs(vWP.x-5.6))),
+                   max(smoothstep(1.,0.,abs(vWP.x-14.4)), smoothstep(1.4,0.,abs(vWP.z+64.))));
+      edge = max(edge, smoothstep(1.4,0.,abs(vWP.x-16.5)));
+      float n = fbm(vWP.xz*.17) + .25*fbm(vWP.xz*1.3) + .06*noise(vWP.xz*9.);
+      float path = smoothstep(2.2, 0., abs(vWP.x-1.)) * step(-44., vWP.z);
+      float sv = n + edge*.55 - path*.18;
+      float snowM = smoothstep(.6, .76, sv);
+      float crust = smoothstep(.6,.68,sv) * (1.-smoothstep(.68,.8,sv));
+      vec3 snowC = vec3(.74,.8,.93) * (.9 + .12*noise(vWP.xz*6.)) + crust*.06;
+      float spark = step(.985, fract(sin(dot(floor(vWP.xz*55.), vec2(12.9898,78.233)))*43758.5)) * snowM;
+      snowC += spark * .9;
+      diffuseColor.rgb = mix(diffuseColor.rgb, snowC, snowM);
+      float wet = max(smoothstep(.5,.6, n) * (1.-snowM), smoothstep(.5,.6,sv) * (1.-smoothstep(.6,.66,sv)) * .9);
+      diffuseColor.rgb *= 1. - wet*.3;
+    `).replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+      roughnessFactor = mix(roughnessFactor, .35, wet);`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+      normal = normalize(mix(normal, normalize(vNormal), snowM));`);
+  };
+  const addGround = (x0, x1, z0, z1) => {
+    const g = new T.PlaneGeometry(x1 - x0, z1 - z0, 1, 1); g.rotateX(-Math.PI / 2); g.translate((x0 + x1) / 2, 0, (z0 + z1) / 2);
+    const p = g.attributes.position, uv = g.attributes.uv;
+    for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / 3.0, p.getZ(i) / 3.0);
+    const m = new T.Mesh(g, groundMat); m.receiveShadow = true; M.scene.add(m);
+  };
+  addGround(-90, 5.6, -150, 90); addGround(14.4, 110, -150, 90); addGround(5.6, 14.4, -150, -44); addGround(5.6, 14.4, 30, 90);
+
+  // ---- 雪堆 ----
+  const pileGeo = new T.SphereGeometry(1, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+  { const p = pileGeo.attributes.position, v = new T.Vector3();
+    for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); const a = Math.atan2(v.z, v.x);
+      const k = 1 + 0.22 * (M.noise2(Math.cos(a) * 2 + 5, Math.sin(a) * 2 + v.y * 2) - 0.5) + 0.08 * Math.sin(a * 5);
+      p.setXYZ(i, v.x * k, v.y * (0.9 + 0.25 * M.noise2(v.x * 3 + 9, v.z * 3)), v.z * k); }
+    pileGeo.computeVertexNormals(); }
+  const piles = new T.InstancedMesh(pileGeo, M.mat.snow, 90);
+  const r = M.rand(42), dm = new T.Object3D();
+  const spots = [];
+  for (let i = 0; i < 40; i++) spots.push([-3.6 + r() * 0.5, 17 - r() * 60]);
+  for (let i = 0; i < 20; i++) spots.push([-11 + r() * 32, -63.5 + r() * 0.8]);
+  for (let i = 0; i < 12; i++) spots.push([14.6 + r() * 1.2, 26 - r() * 68]);
+  spots.forEach(([x, z], i) => {
+    const s = 0.22 + r() * 0.4; dm.position.set(x, -0.02, z); dm.scale.set(s * (1 + r()), s * 0.32, s); dm.rotation.y = r() * 6;
+    dm.updateMatrix(); piles.setMatrixAt(i, dm.matrix);
+  });
+  piles.count = spots.length; piles.receiveShadow = true; M.scene.add(piles);
+
+  // ---- 降雪（着色器内绕相机循环）----
+  const N = 3200, pos = new Float32Array(N * 3), seed = new Float32Array(N);
+  for (let i = 0; i < N; i++) { pos[i * 3] = r() * 44 - 22; pos[i * 3 + 1] = r() * 22; pos[i * 3 + 2] = r() * 44 - 22; seed[i] = r(); }
+  const sg = new T.BufferGeometry();
+  sg.setAttribute('position', new T.BufferAttribute(pos, 3)); sg.setAttribute('aSeed', new T.BufferAttribute(seed, 1));
+  const snowU = { uTime: { value: 0 }, uCam: { value: new T.Vector3() }, uScale: { value: 300 }, uAmount: { value: 1 } };
+  const snow = new T.Points(sg, new T.ShaderMaterial({
+    uniforms: snowU, transparent: true, depthWrite: false,
+    vertexShader: `attribute float aSeed; uniform float uTime, uScale, uAmount; uniform vec3 uCam; varying float vA;
+      void main(){
+        vec3 p = position;
+        p.y = mod(p.y - uTime*(.6 + aSeed*.6), 22.);
+        p.x += sin(uTime*(.5+aSeed) + aSeed*30.)*.6; p.z += cos(uTime*(.4+aSeed*.7) + aSeed*20.)*.4;
+        p.xz = mod(p.xz - uCam.xz + 22., 44.) - 22. + uCam.xz;
+        p.y += max(uCam.y - 11., -1.);
+        vec4 mv = modelViewMatrix*vec4(p,1.);
+        float dist = -mv.z;
+        gl_PointSize = (0.035 + aSeed*.04) * uScale / max(dist, .1);
+        vA = smoothstep(.3, 1.5, dist) * smoothstep(24., 10., dist) * step(aSeed, uAmount);
+        gl_Position = projectionMatrix*mv;
+      }`,
+    fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord-.5); gl_FragColor = vec4(vec3(.95), vA*smoothstep(.5,.15,d)*.85); }`
+  }));
+  snow.frustumCulled = false; snow.renderOrder = 5; M.scene.add(snow);
+
+  // ---- 脚印 ----
+  const fpMax = 200;
+  const fp = new T.InstancedMesh(new T.CircleGeometry(0.06, 10), new T.MeshBasicMaterial({
+    color: M.col('#3b4560'), transparent: true, opacity: 0.4, depthWrite: false }), fpMax);
+  fp.count = 0; fp.renderOrder = 1; M.scene.add(fp);
+  let fpi = 0;
+  M.footprint = (x, z, heading) => {
+    dm.position.set(x, 0.015, z); dm.rotation.set(-Math.PI / 2, 0, heading); dm.scale.set(1, 1.7, 1); dm.updateMatrix();
+    fp.setMatrixAt(fpi, dm.matrix); fpi = (fpi + 1) % fpMax; fp.count = Math.min(fpMax, fp.count + 1); fp.instanceMatrix.needsUpdate = true;
+  };
+
+  M.onFrame(() => {
+    skyU.uTime.value = M.time; snowU.uTime.value = M.time;
+    sky.position.copy(M.camera.position); ring.position.x = M.camera.position.x; ring.position.z = M.camera.position.z;
+    snowU.uCam.value.copy(M.camera.position);
+    snowU.uScale.value = M.renderer.getPixelRatio() * innerHeight * 0.5;
+  }, 90);
+})();
+// ===== 05a-houses.js：房屋生成器 + 几何合并 + 窗户实例化 =====
+(() => {
+  // ---- 按材质合并几何（r128 classic 没有 BufferGeometryUtils）----
+  const batches = new Map();
+  M.batch = {
+    add(geo, mat, matrix) {
+      let g = geo.index ? geo.toNonIndexed() : geo.clone();
+      if (matrix) g.applyMatrix4(matrix);
+      if (!batches.has(mat)) batches.set(mat, []);
+      batches.get(mat).push(g);
+    },
+    flush(opts = {}) {
+      for (const [mat, list] of batches) {
+        let n = 0; list.forEach(g => n += g.attributes.position.count);
+        const P = new Float32Array(n * 3), N = new Float32Array(n * 3), UV = new Float32Array(n * 2);
+        let o = 0;
+        for (const g of list) {
+          const c = g.attributes.position.count;
+          P.set(g.attributes.position.array, o * 3); N.set(g.attributes.normal.array, o * 3);
+          if (g.attributes.uv) UV.set(g.attributes.uv.array, o * 2);
+          o += c; g.dispose();
+        }
+        const geo = new T.BufferGeometry();
+        geo.setAttribute('position', new T.BufferAttribute(P, 3)); geo.setAttribute('normal', new T.BufferAttribute(N, 3));
+        geo.setAttribute('uv', new T.BufferAttribute(UV, 2)); geo.computeBoundingSphere();
+        const m = new T.Mesh(geo, mat); m.castShadow = opts.cast !== false; m.receiveShadow = true; M.scene.add(m);
+      }
+      batches.clear();
+    }
+  };
+  const _m4 = new T.Matrix4(), _q = new T.Quaternion(), _e = new T.Euler(), _v = new T.Vector3(), _s = new T.Vector3();
+  const mtx = (x, y, z, rx = 0, ry = 0, rz = 0, sx = 1, sy = 1, sz = 1) =>
+    new T.Matrix4().compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), _s.set(sx, sy, sz));
+  M.mtx = mtx;
+  const unitBox = new T.BoxGeometry(1, 1, 1);
+  M.unitBox = unitBox;
+
+  // ---- 窗户贴图：2×2 图集（0 窗帘两侧 / 1 半掩窗帘+盆栽 / 2 吊灯 / 3 半放百叶）----
+  const winTex = M.canvasTex('windowAtlas', 256, (g, S) => {
+    const s = S / 2, PI2 = Math.PI * 2;
+    const cell = (cx, cy, fn) => { g.save(); g.translate(cx * s, cy * s); g.beginPath(); g.rect(0, 0, s, s); g.clip(); fn(); g.restore(); };
+    const warm = (a = '#fff0c8', b = '#ffc070', c = '#e88a3c') => { const gr = g.createLinearGradient(0, 0, 0, s);
+      gr.addColorStop(0, a); gr.addColorStop(0.6, b); gr.addColorStop(1, c); g.fillStyle = gr; g.fillRect(0, 0, s, s); };
+    const bars = () => { g.fillStyle = '#2a1a12'; g.fillRect(s * 0.47, 0, s * 0.06, s); g.fillRect(0, s * 0.42, s, s * 0.05); };
+    cell(0, 0, () => { warm(); g.fillStyle = 'rgba(120,40,20,0.55)'; g.fillRect(0, 0, s * 0.16, s); g.fillRect(s * 0.84, 0, s * 0.16, s); bars(); });
+    cell(1, 0, () => { warm('#ffe9b8', '#ffb868', '#d97a34');
+      g.fillStyle = 'rgba(150,60,40,0.7)'; g.beginPath(); g.moveTo(0, 0); g.lineTo(s * 0.48, 0); g.quadraticCurveTo(s * 0.2, s * 0.5, s * 0.14, s); g.lineTo(0, s); g.fill();
+      g.fillStyle = 'rgba(40,40,20,0.85)';
+      for (const [x, r] of [[0.62, 0.09], [0.8, 0.07]]) { g.fillRect(s * (x - 0.05), s * 0.86, s * 0.1, s * 0.14);
+        g.beginPath(); g.arc(s * x, s * 0.8, s * r, 0, PI2); g.fill(); }
+      bars(); });
+    cell(0, 1, () => { warm('#fff4d6', '#ffcf86', '#f09a4a');
+      const gr = g.createRadialGradient(s * 0.5, s * 0.3, 2, s * 0.5, s * 0.3, s * 0.4); gr.addColorStop(0, 'rgba(255,255,230,0.9)'); gr.addColorStop(1, 'rgba(255,255,230,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, s, s); g.fillStyle = 'rgba(50,25,10,0.8)'; g.fillRect(s * 0.495, 0, s * 0.01, s * 0.2);
+      g.beginPath(); g.moveTo(s * 0.38, s * 0.3); g.lineTo(s * 0.62, s * 0.3); g.lineTo(s * 0.55, s * 0.2); g.lineTo(s * 0.45, s * 0.2); g.fill(); bars(); });
+    cell(1, 1, () => { warm(); g.fillStyle = 'rgba(90,50,30,0.9)'; g.fillRect(0, 0, s, s * 0.34);
+      g.fillStyle = 'rgba(40,20,10,0.5)'; for (let y = 4; y < s * 0.34; y += 6) g.fillRect(0, y, s, 1.5); bars(); });
+  }, { clamp: true });
+  const darkTex = M.canvasTex('windowDark', 64, (g, s) => {
+    const gr = g.createLinearGradient(0, 0, s, s); gr.addColorStop(0, '#5a6a90'); gr.addColorStop(0.5, '#1a2238'); gr.addColorStop(1, '#0d1220');
+    g.fillStyle = gr; g.fillRect(0, 0, s, s);
+    g.fillStyle = 'rgba(170,190,230,0.18)'; g.beginPath(); g.moveTo(s * 0.1, s); g.lineTo(s * 0.35, s); g.lineTo(s * 0.75, 0); g.lineTo(s * 0.5, 0); g.fill();
+    g.fillStyle = '#0a0a0e'; g.fillRect(s * 0.46, 0, s * 0.08, s); g.fillRect(0, s * 0.42, s, s * 0.07);
+  }, { clamp: true });
+  const litMat = new T.MeshBasicMaterial({ map: winTex, color: 0xffffff });
+  litMat.onBeforeCompile = sh => {
+    sh.vertexShader = 'attribute float aVar;\n' + sh.vertexShader.replace('#include <uv_vertex>',
+      '#include <uv_vertex>\n vUv = vUv*.5 + vec2(mod(aVar,2.), floor(aVar/2.))*.5;');
+  };
+  const darkMat = new T.MeshStandardMaterial({ map: darkTex, roughness: 0.15, metalness: 0.2, color: M.col('#a8b4d0'),
+    emissive: M.col('#28324c'), emissiveIntensity: 1 });
+  const lit = [], dark = [];
+  const frameMat = M.mat.std('#2b211c', 0.7), doorMat = M.mat.std('#4a2c1c', 0.75, { map: M.tex.wood() });
+  const plinthMat = M.mat.std('#3b3a40', 0.9, { map: M.tex.stone() }), chimMat = M.mat.std('#6a3a2c', 0.9, { map: M.tex.stone() });
+  const roofMats = ['#5a2e26', '#3a3f4a', '#6b3524', '#2f3540'].map(c => M.mat.std(c, 0.8, { flat: true }));
+  const shutterMats = ['#2f4a3a', '#6a2a26', '#2a3a55'].map(c => M.mat.std(c, 0.75, { map: M.tex.wood() }));
+  const trimMat = c => M.mat.std('#' + new T.Color(c).multiplyScalar(0.72).getHexString(), 0.9);
+  // 墙面近地处叠一层暖色"街灯反光"，代替大量点光源
+  M.town = { facadeWarm: { value: 1 } };
+  const bodyMat = c => {
+    const m = M.mat.std(c, 0.92, { map: M.tex.plaster() });
+    if (!m.userData.warm) {
+      m.userData.warm = true;
+      m.onBeforeCompile = sh => {
+        sh.uniforms.uFW = M.town.facadeWarm;
+        sh.vertexShader = 'varying vec3 vWP;\n' + sh.vertexShader.replace('#include <worldpos_vertex>',
+          '#include <worldpos_vertex>\n vWP = (modelMatrix*vec4(transformed,1.)).xyz;');
+        sh.fragmentShader = 'uniform float uFW; varying vec3 vWP;\n' + M.glslNoise + sh.fragmentShader.replace('#include <emissivemap_fragment>',
+          `#include <emissivemap_fragment>
+          float wl = exp(-max(vWP.y,0.)*.28) * (.55 + .45*noise(vWP.xz*.35 + vWP.y*.1));
+          totalEmissiveRadiance += diffuseColor.rgb * vec3(1.,.55,.26) * wl * .55 * uFW;
+          totalEmissiveRadiance += diffuseColor.rgb * vec3(.32,.38,.6) * .12;`);
+      };
+    }
+    return m;
+  };
+  Object.assign(M.town, { litMat, lit, doorLamps: [], pools: [], chimneys: [] });
+
+  // opts: {x,z 正立面中心, facing 角度, w,d,h, color, roof:'eave'|'gable'|'step', seed, door, lit}
+  M.house = (o) => {
+    const r = M.rand(o.seed || 1), W = o.w, D = o.d || 8, H = o.h, base = mtx(o.x, 0, o.z, 0, o.facing, 0);
+    const put = (geo, mat, local) => M.batch.add(geo, mat, new T.Matrix4().multiplyMatrices(base, local));
+    const box = (mat, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0) => put(unitBox, mat, mtx(x, y, z, rx, ry, rz, sx, sy, sz));
+    box(bodyMat(o.color), 0, H / 2, -D / 2, W, H, D);
+    box(plinthMat, 0, 0.3, -D / 2 + 0.05, W + 0.08, 0.6, D);
+    box(trimMat(o.color), 0, H - 0.25, 0.06, W + 0.1, 0.22, 0.16);
+    box(trimMat(o.color), 0, H - 0.08, 0.1, W + 0.16, 0.1, 0.22);
+    const roofMat = roofMats[(r() * roofMats.length) | 0], rh = o.roofH || (2.2 + r() * 1.6), kind = o.roof || 'eave';
+    if (kind === 'gable') {
+      const half = W / 2 + 0.25, sh = new T.Shape([new T.Vector2(-half, 0), new T.Vector2(half, 0), new T.Vector2(0, rh)]);
+      put(new T.ExtrudeGeometry(sh, { depth: D + 0.15, bevelEnabled: false }), roofMat, mtx(0, H, -D));
+      const k = (W / 2) / half, tri = new T.Shape([new T.Vector2(-W / 2, 0), new T.Vector2(W / 2, 0), new T.Vector2(0, rh * k)]);
+      put(new T.ExtrudeGeometry(tri, { depth: 0.04, bevelEnabled: false }), bodyMat(o.color), mtx(0, H, 0.15));
+      const a = Math.atan2(rh, half), L = Math.hypot(half, rh);
+      box(M.mat.snow, -half / 2, H + rh / 2 + 0.07, -D / 2 + 0.07, L, 0.13, D + 0.2, 0, 0, a);
+      box(M.mat.snow, half / 2, H + rh / 2 + 0.07, -D / 2 + 0.07, L, 0.13, D + 0.2, 0, 0, -a);
+      if (H > 6) { // 山墙小圆窗
+        lit.push({ m: new T.Matrix4().multiplyMatrices(base, mtx(0, H + rh * 0.35, 0.2, 0, 0, 0, 0.5, 0.5, 1)), k: 0.8 + r() });
+      }
+    } else {
+      const half = D / 2 + 0.3, sh = new T.Shape([new T.Vector2(-half, 0), new T.Vector2(half, 0), new T.Vector2(0, rh)]);
+      const g = new T.ExtrudeGeometry(sh, { depth: W + 0.4, bevelEnabled: false }); g.rotateY(Math.PI / 2);
+      put(g, roofMat, mtx(-(W + 0.4) / 2, H, -D / 2));
+      const a = Math.atan2(rh, half), L = Math.hypot(half, rh);
+      box(M.mat.snow, 0, H + rh / 2 + 0.07, -D / 2 + half / 2, W + 0.45, 0.13, L, a);
+      box(M.mat.snow, 0, H + rh / 2 + 0.07, -D / 2 - half / 2, W + 0.45, 0.13, L, -a);
+      if (kind === 'step') {
+        const steps = 4, sw = W / (steps * 2 - 1);
+        for (let i = 0; i < steps; i++) {
+          const ww = W - i * 2 * sw, yy = H + (i + 0.5) * (rh * 1.15 / steps);
+          box(bodyMat(o.color), 0, yy, -0.15, ww, rh * 1.15 / steps, 0.32);
+          box(M.mat.snow, 0, H + (i + 1) * (rh * 1.15 / steps) + 0.04, -0.15, ww + 0.06, 0.08, 0.36);
+        }
+      }
+    }
+    if (r() < 0.75) { const cx = (r() - 0.5) * W * 0.6, cz = -D * (0.3 + r() * 0.4);
+      box(chimMat, cx, H + rh * 0.75, cz, 0.6, rh * 1.1, 0.6); box(M.mat.snow, cx, H + rh * 1.32, cz, 0.68, 0.1, 0.68);
+      M.town.chimneys.push(new T.Vector3(cx, H + rh * 1.4, cz).applyMatrix4(base)); }
+
+    // ---- 窗户 ----
+    if (o.windows === false) return;
+    const floors = Math.max(1, Math.floor((H - 0.6) / 2.7)), cols = Math.max(1, Math.floor(W / 1.35));
+    const doorCol = o.door === false ? -1 : (o.doorCol ?? ((r() * cols) | 0));
+    const trim = trimMat(o.color), shut = r() < 0.36 ? shutterMats[(r() * shutterMats.length) | 0] : null;
+    for (let f = 1; f < floors; f++) box(trim, 0, 0.4 + f * 2.7, 0.06, W + 0.04, 0.12, 0.12);
+    for (let f = 0; f < floors; f++) for (let c = 0; c < cols; c++) {
+      const x = (c - (cols - 1) / 2) * (W / cols), y = 1.75 + f * 2.7;
+      if (f === 0 && o.skipGround && o.skipGround(x)) continue;
+      if (f === 0 && c === doorCol) {
+        box(frameMat, x, 1.15, 0.03, 1.2, 2.3, 0.08); box(doorMat, x, 1.1, 0.07, 1.0, 2.1, 0.06);
+        box(trim, x, 2.42, 0.1, 1.4, 0.14, 0.2); box(M.mat.snow, x, 2.51, 0.11, 1.38, 0.05, 0.2);
+        const lp = new T.Vector3(x + 0.75, 2.45, 0.25).applyMatrix4(base); M.town.doorLamps.push(lp);
+        lit.push({ m: new T.Matrix4().multiplyMatrices(base, mtx(x + 0.75, 2.45, 0.22, 0, 0, 0, 0.16, 0.22, 1)), k: 2.6, v: 2 });
+        continue;
+      }
+      box(frameMat, x, y, 0.03, 0.86, 1.24, 0.06);
+      box(M.mat.snow, x, y - 0.66, 0.1, 0.96, 0.07, 0.22);
+      box(trim, x, y + 0.72, 0.09, 1.04, 0.11, 0.16); box(M.mat.snow, x, y + 0.79, 0.1, 1.0, 0.04, 0.17);
+      if (shut) for (const sx of [-1, 1]) box(shut, x + sx * 0.64, y, 0.07, 0.38, 1.22, 0.05, 0, sx * 0.25, 0);
+      const wm = new T.Matrix4().multiplyMatrices(base, mtx(x, y, 0.066, 0, 0, 0, 0.7, 1.06, 1));
+      if (r() < (o.lit ?? 0.6)) {
+        lit.push({ m: wm, k: 0.9 + r() * 1.6 });
+        if (f === 0) M.town.pools.push(new T.Vector3(x, 0, 1.4).applyMatrix4(base));
+      } else dark.push(wm);
+    }
+  };
+
+  // 统一生成实例化窗户（布局完成后由 05b 调用）
+  M.house.flushWindows = () => {
+    const plane = new T.PlaneGeometry(1, 1), vr = M.rand(404);
+    const lgeo = plane.clone(), aVar = new Float32Array(lit.length);
+    lit.forEach((w, i) => { aVar[i] = w.v ?? ((vr() * 4) | 0); });
+    lgeo.setAttribute('aVar', new T.InstancedBufferAttribute(aVar, 1));
+    const li = new T.InstancedMesh(lgeo, litMat, lit.length), c = new T.Color();
+    lit.forEach((w, i) => { li.setMatrixAt(i, w.m); li.setColorAt(i, c.setRGB(1.6, 1.25, 0.9).multiplyScalar(w.k)); });
+    li.instanceColor.needsUpdate = true; M.scene.add(li);
+    const di = new T.InstancedMesh(plane, darkMat, Math.max(1, dark.length));
+    dark.forEach((m, i) => di.setMatrixAt(i, m)); di.count = dark.length; di.receiveShadow = true; M.scene.add(di);
+    M.town.litMesh = li;
+  };
+})();
+// ===== 05b-town.js：房屋布局、面包房、教堂 =====
+(() => {
+  const PAL = ['#c9a14a', '#a8442f', '#3f6d8a', '#5d7a4c', '#d8cbb0', '#8b5a3c', '#2f4a66', '#b8803a', '#9b3b3b'];
+  const r = M.rand(2024);
+  const pick = a => a[(r() * a.length) | 0];
+  const roofKind = () => { const k = r(); return k < 0.5 ? 'eave' : k < 0.8 ? 'gable' : 'step'; };
+  let seed = 100;
+  // 沿一条线排房子：from→to 为沿立面方向的坐标，place(c, w) 返回 {x,z}
+  const row = (from, to, facing, place, opt = {}) => {
+    const dir = Math.sign(to - from); let c = from;
+    while (dir * (to - c) > 1.5) {
+      let w = 4 + r() * 2.2;
+      if (opt.skip) for (const [a, b] of opt.skip) {
+        if (dir * (a - c) >= 0 && dir * (c + dir * w - a) > 0) w = Math.abs(a - c);
+        if (dir * (c - a) >= 0 && dir * (b - c) > 0) { c = b; w = 0; }
+      }
+      if (w > 0.6) {
+        w = Math.min(w, Math.abs(to - c));
+        const p = place(c + dir * w / 2);
+        M.house({ ...p, facing, w: w - 0.02, d: opt.d || 8, h: 7 + r() * 5, color: pick(PAL), roof: roofKind(), seed: seed++, lit: opt.lit });
+      }
+      c += dir * w;
+    }
+  };
+  const PI = Math.PI;
+  row(18, -44, PI / 2, z => ({ x: -4, z }), { skip: [[-9, -15]] });          // 西排
+  row(30, -43, -PI / 2, z => ({ x: 16.5, z }));                               // 东排
+  row(-14, -1, 0, x => ({ x, z: -65 }));                                       // 北排西段
+  row(9, 25, 0, x => ({ x, z: -65 }));                                         // 北排东段
+  row(-44.5, -64.5, PI / 2, z => ({ x: -12, z }), { d: 7 });                   // 广场西
+  row(-44.5, -64.5, -PI / 2, z => ({ x: 22, z }), { d: 7 });                   // 广场东
+  M.house({ x: -8, z: -44, facing: PI, w: 7.9, d: 7, h: 9, color: '#b8803a', roof: 'eave', seed: seed++ });
+  M.house({ x: 19.2, z: -44, facing: PI, w: 5.4, d: 7, h: 10, color: '#3f6d8a', roof: 'gable', seed: seed++ });
+  M.house({ x: 0.8, z: 19.5, facing: PI, w: 9.6, d: 8, h: 11, color: '#a8442f', roof: 'step', seed: seed++ });
+  M.house({ x: 11, z: 31, facing: PI, w: 10, d: 8, h: 10, color: '#5d7a4c', roof: 'eave', seed: seed++ });
+
+  // ---- 教堂 ----
+  M.house({ x: 4, z: -65, facing: 0, w: 10, d: 12, h: 14, color: '#d8cbb0', roof: 'gable', roofH: 5, seed: 7, door: false,
+    skipGround: () => true, lit: 0.9, windows: false });
+  const stoneMat = M.mat.std('#b9ad98', 0.9, { map: M.tex.stone() }), copper = M.mat.std('#3f6b5c', 0.7, { flat: true });
+  const trimC = M.mat.std('#b8ab94', 0.9, { emissive: '#3a2a1a', ei: 0.35 }), gold = M.mat.std('#c9a24a', 0.35, { metal: 0.7, emissive: '#5a4010', ei: 0.6 });
+  const B = (mat, x, y, z, sx, sy, sz, ry = 0) => M.batch.add(M.unitBox, mat, M.mtx(x, y, z, 0, ry, 0, sx, sy, sz));
+  const plasterC = M.mat.std('#d8cbb0', 0.92, { map: M.tex.plaster() });
+  B(plasterC, 4, 22, -67, 3.6, 10, 3.6);
+  B(trimC, 4, 17.2, -67, 3.85, 0.3, 3.85); B(trimC, 4, 27.15, -67, 3.95, 0.35, 3.95); B(M.mat.snow, 4, 27.36, -67, 3.9, 0.08, 3.9);
+  // 钟楼开口（四面）+ 表盘
+  const dark = M.mat.std('#140c08', 0.9);
+  for (const [dx, dz, ry] of [[0, 1.81, 0], [0, -1.81, 0], [1.81, 0, PI / 2], [-1.81, 0, PI / 2]]) {
+    B(dark, 4 + dx, 24.9, -67 + dz, 1.0, 2.2, 0.05, ry);
+    const a = new T.CylinderGeometry(0.5, 0.5, 0.05, 16, 1, false, 0, PI); a.rotateX(PI / 2); a.rotateZ(PI / 2);
+    M.batch.add(a, dark, M.mtx(4 + dx, 26.0, -67 + dz, 0, ry, 0));
+    B(M.mat.snow, 4 + dx, 23.82, -67 + dz, 1.2, 0.06, 0.2, ry);
+  }
+  const clockTex = M.canvasTex('clock', 256, (g, s) => {
+    g.fillStyle = '#f3ead2'; g.beginPath(); g.arc(s / 2, s / 2, s * 0.48, 0, PI * 2); g.fill();
+    g.strokeStyle = '#3a2a1a'; g.lineWidth = 8; g.stroke();
+    for (let i = 0; i < 12; i++) { const a = i * PI / 6; g.lineWidth = i % 3 ? 4 : 9;
+      g.beginPath(); g.moveTo(s / 2 + Math.sin(a) * s * 0.36, s / 2 - Math.cos(a) * s * 0.36); g.lineTo(s / 2 + Math.sin(a) * s * 0.44, s / 2 - Math.cos(a) * s * 0.44); g.stroke(); }
+    g.lineCap = 'round'; g.lineWidth = 10; g.beginPath(); g.moveTo(s / 2, s / 2); g.lineTo(s / 2 - s * 0.05, s / 2 - s * 0.24); g.stroke();
+    g.lineWidth = 6; g.beginPath(); g.moveTo(s / 2, s / 2); g.lineTo(s / 2 - s * 0.03, s / 2 - s * 0.38); g.stroke();
+  }, { clamp: true });
+  const clock = new T.Mesh(new T.CircleGeometry(0.95, 40), new T.MeshBasicMaterial({ map: clockTex, color: M.col('#ffffff').multiplyScalar(1.15) }));
+  clock.position.set(4, 21.6, -65.17); M.scene.add(clock);
+  M.batch.add(new T.TorusGeometry(1.0, 0.08, 6, 40), gold, M.mtx(4, 21.6, -65.17));
+  // 八棱塔尖 + 四角小尖 + 金球十字
+  M.batch.add(new T.ConeGeometry(2.05, 9, 8), copper, M.mtx(4, 31.9, -67, 0, PI / 8, 0));
+  for (const [dx, dz] of [[1.6, 1.6], [-1.6, 1.6], [1.6, -1.6], [-1.6, -1.6]]) {
+    M.batch.add(new T.ConeGeometry(0.28, 1.7, 6), copper, M.mtx(4 + dx, 28.2, -67 + dz));
+    M.batch.add(new T.SphereGeometry(0.07, 8, 6), gold, M.mtx(4 + dx, 29.1, -67 + dz));
+  }
+  M.batch.add(new T.SphereGeometry(0.24, 14, 10), gold, M.mtx(4, 36.55, -67));
+  B(gold, 4, 37.35, -67, 0.1, 1.3, 0.1); B(gold, 4, 37.55, -67, 0.7, 0.1, 0.1);
+  // 正立面：壁柱、门楣、门边小柱、台阶
+  for (const x of [-0.75, 1.9, 6.1, 8.75]) { B(trimC, x, 6.9, -64.88, 0.5, 13.6, 0.26); B(trimC, x, 0.35, -64.82, 0.66, 0.7, 0.4); }
+  B(trimC, 4, 13.6, -64.84, 10.3, 0.4, 0.34); B(M.mat.snow, 4, 13.84, -64.82, 10.3, 0.06, 0.36);
+  for (const x of [2.85, 5.15]) { M.batch.add(new T.CylinderGeometry(0.16, 0.18, 3.6, 12), trimC, M.mtx(x, 1.8, -64.75)); B(trimC, x, 3.68, -64.75, 0.42, 0.16, 0.42); }
+  { const tri = new T.Shape([new T.Vector2(-1.45, 0), new T.Vector2(1.45, 0), new T.Vector2(0, 0.85)]);
+    M.batch.add(new T.ExtrudeGeometry(tri, { depth: 0.3, bevelEnabled: false }), trimC, M.mtx(4, 4.25, -64.95));
+    B(M.mat.snow, 4, 4.3, -64.75, 2.9, 0.05, 0.3); }
+  for (let i = 0; i < 3; i++) { const dz = 2.7 - i * 0.85;
+    B(stoneMat, 4, 0.07 + i * 0.14, -65 + dz / 2, 6.4 - i * 0.8, 0.14, dz);
+    B(M.mat.snow, 4 - (2.9 - i * 0.4), 0.16 + i * 0.14, -65 + dz - 0.2, 0.5, 0.06, 0.35); }
+  for (const x of [0.6, 7.4]) { B(stoneMat, x, 0.45, -63.6, 0.7, 0.9, 0.9); B(M.mat.snow, x, 0.93, -63.6, 0.74, 0.08, 0.94); }
+  B(M.mat.std('#2b1a12', 0.7), 4, 1.6, -64.95, 1.8, 3.2, 0.12);
+  const arch = new T.CylinderGeometry(0.9, 0.9, 0.12, 20, 1, false, 0, PI); arch.rotateX(PI / 2); arch.rotateZ(PI / 2);
+  M.batch.add(arch, M.mat.std('#2b1a12', 0.7), M.mtx(4, 3.2, -64.95));
+  for (let i = 0; i < 5; i++) M.colliders.push({ x: 0.8 + i * 1.6, z: -63.6, r: 1.4 });
+  // 彩色玻璃：高拱窗（正面 2、侧面各 3）
+  const stained = M.canvasTex('stained', 256, (g, s) => {
+    const w = s / 2, r2 = M.rand(9), cols = ['#ffcf70', '#ff7a4a', '#6a9cff', '#ffe9b0', '#c8503a', '#8fd0ff', '#b07ad8'];
+    g.save(); g.beginPath(); g.moveTo(w * 0.08, s); g.lineTo(w * 0.08, s * 0.25); g.arc(w / 2, s * 0.25, w * 0.42, PI, 0); g.lineTo(w * 0.92, s); g.closePath(); g.clip();
+    for (let y = 0; y < s; y += 18) for (let x = 0; x < w; x += 16) { g.fillStyle = cols[(r2() * cols.length) | 0]; g.fillRect(x, y, 16, 18); }
+    g.strokeStyle = '#1a0e08'; g.lineWidth = 3; for (let y = 0; y < s; y += 18) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    for (let x = 0; x < w; x += 16) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, s); g.stroke(); }
+    g.restore(); g.strokeStyle = '#1a0e08'; g.lineWidth = 6; g.beginPath(); g.moveTo(w * 0.08, s); g.lineTo(w * 0.08, s * 0.25);
+    g.arc(w / 2, s * 0.25, w * 0.42, PI, 0); g.lineTo(w * 0.92, s); g.stroke();
+  }, { clamp: true });
+  const stMat = new T.MeshBasicMaterial({ map: stained, color: M.col('#ffffff').multiplyScalar(1.5), transparent: true, alphaTest: 0.5, side: T.DoubleSide });
+  const stGeo = new T.PlaneGeometry(1.1, 3.4); { const uv = stGeo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * 0.5); }
+  for (const x of [0.6, 7.4]) M.batch.add(stGeo, stMat, M.mtx(x, 6.4, -64.93));
+  for (const sx of [-1.03, 9.03]) for (const z of [-68, -71.2, -74.4]) M.batch.add(stGeo, stMat, M.mtx(sx, 7.2, z, 0, PI / 2));
+  const rose = M.canvasTex('rose2', 512, (g, s) => {
+    const c = s / 2, R = s * 0.47, cols = ['#ffcf70', '#ff7a4a', '#6a9cff', '#ffe9b0', '#c8503a', '#8fd0ff', '#b07ad8', '#ffd890'];
+    g.fillStyle = '#1a0e08'; g.beginPath(); g.arc(c, c, R + 6, 0, PI * 2); g.fill();
+    for (let i = 0; i < 16; i++) { const a = i * PI / 8; g.fillStyle = cols[i % cols.length];
+      g.beginPath(); g.arc(c + Math.cos(a) * R * 0.72, c + Math.sin(a) * R * 0.72, R * 0.24, 0, PI * 2); g.fill(); }
+    for (let i = 0; i < 8; i++) { const a = i * PI / 4 + PI / 8; g.fillStyle = cols[(i + 3) % cols.length];
+      g.beginPath(); g.moveTo(c, c); g.arc(c, c, R * 0.46, a - 0.33, a + 0.33); g.fill(); }
+    g.strokeStyle = '#1a0e08'; g.lineWidth = 7;
+    for (let i = 0; i < 16; i++) { const a = i * PI / 8; g.beginPath(); g.arc(c + Math.cos(a) * R * 0.72, c + Math.sin(a) * R * 0.72, R * 0.24, 0, PI * 2); g.stroke(); }
+    for (let i = 0; i < 8; i++) { const a = i * PI / 4; g.beginPath(); g.moveTo(c, c); g.lineTo(c + Math.cos(a) * R * 0.48, c + Math.sin(a) * R * 0.48); g.stroke(); }
+    g.beginPath(); g.arc(c, c, R * 0.47, 0, PI * 2); g.stroke();
+    g.fillStyle = '#ffe1a0'; g.beginPath(); g.arc(c, c, R * 0.13, 0, PI * 2); g.fill(); g.stroke();
+  }, { clamp: true });
+  const roseM = new T.Mesh(new T.CircleGeometry(1.4, 48), new T.MeshBasicMaterial({ map: rose, color: M.col('#ffffff').multiplyScalar(1.45) }));
+  roseM.position.set(4, 9.5, -64.93); M.scene.add(roseM);
+  M.batch.add(new T.TorusGeometry(1.48, 0.14, 8, 48), trimC, M.mtx(4, 9.5, -64.9));
+  M.town.rose = roseM;
+
+  // ---- 面包房（单独 Group，有动画）----
+  M.house({ x: -4, z: -12, facing: PI / 2, w: 6, d: 8, h: 10.5, color: '#c9a14a', roof: 'step', seed: 55, door: false, skipGround: () => true });
+  const bk = new T.Group(); bk.position.set(-4, 0, -12); bk.rotation.y = PI / 2; M.scene.add(bk);
+  const wood = M.mat.std('#3b2216', 0.7, { map: M.tex.wood() });
+  const add = (geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz);
+    m.castShadow = true; m.receiveShadow = true; bk.add(m); return m; };
+  const BX = M.unitBox;
+  add(BX, wood, 0.6, 0.3, 0.42, 2.6, 0.6, 0.84);
+  add(BX, wood, 0.6, 2.6, 0.45, 2.75, 0.26, 0.92);
+  add(BX, M.mat.snow, 0.6, 2.77, 0.47, 2.8, 0.08, 0.95);
+  add(BX, wood, -0.68, 1.5, 0.42, 0.12, 2.1, 0.84); add(BX, wood, 1.88, 1.5, 0.42, 0.12, 2.1, 0.84);
+  const roomMat = new T.MeshStandardMaterial({ color: M.col('#a8683a'), roughness: 0.9, side: T.BackSide,
+    emissive: M.col('#ff9450'), emissiveIntensity: 0.35 });
+  // 室内盒比窗框略小，避免内壁与窗框立柱/窗台共面导致 z-fighting 闪烁
+  add(BX, roomMat, 0.6, 1.545, 0.42, 2.36, 1.83, 0.78);
+  // 室内盒用内表面，自身接收阴影会产生斜纹（shadow acne），随阴影相机移动而闪烁；室内靠自发光照明，不需要阴影
+  { const room = bk.children[bk.children.length - 1]; room.castShadow = false; room.receiveShadow = false; }
+  add(BX, wood, 0.6, 1.0, 0.42, 2.0, 0.07, 0.5);
+  const glass = new T.Mesh(new T.PlaneGeometry(2.44, 1.9), new T.MeshStandardMaterial({ color: M.col('#cfe0ff'), roughness: 0.05,
+    metalness: 0.6, transparent: true, opacity: 0.12, depthWrite: false }));
+  glass.position.set(0.6, 1.55, 0.82); bk.add(glass);
+  add(BX, wood, 0.6, 1.55, 0.83, 0.05, 1.9, 0.04); add(BX, wood, 0.6, 1.9, 0.83, 2.44, 0.05, 0.04);
+  // 橱窗里的宴席（初始缩为 0）
+  const items = new T.Group(); items.position.set(0.6, 1.04, 0.42); bk.add(items);
+  const goldBread = M.mat.std('#c98a3a', 0.55), roast = M.mat.std('#9a4a1e', 0.35), plateM = M.mat.std('#f2efe8', 0.3);
+  const it = (geo, mat, x, y, z, sx, sy, sz) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz);
+    m.castShadow = true; items.add(m); m.userData.s = m.scale.clone(); m.scale.setScalar(0.0001); return m; };
+  const sph = new T.SphereGeometry(1, 18, 12), cyl = new T.CylinderGeometry(1, 1, 1, 20);
+  it(cyl, plateM, 0, 0.02, 0, 0.36, 0.03, 0.26);
+  it(sph, roast, 0, 0.14, 0, 0.26, 0.15, 0.18);
+  it(sph, roast, 0.2, 0.12, 0.1, 0.09, 0.06, 0.06); it(sph, roast, 0.2, 0.12, -0.1, 0.09, 0.06, 0.06);
+  for (let i = 0; i < 4; i++) it(sph, goldBread, -0.7 + i * 0.13, 0.07, 0.12 - (i % 2) * 0.18, 0.12, 0.07, 0.07);
+  it(sph, goldBread, 0.68, 0.08, 0.05, 0.16, 0.08, 0.1); it(sph, goldBread, 0.55, 0.08, -0.12, 0.13, 0.07, 0.08);
+  const flameM = new T.MeshBasicMaterial({ color: M.col('#ffc070').multiplyScalar(6) });
+  [-0.45, 0.42].forEach(x => { it(cyl, plateM, x, 0.12, -0.15, 0.03, 0.24, 0.03); it(sph, flameM, x, 0.27, -0.15, 0.025, 0.05, 0.025); });
+  // 门
+  add(BX, wood, -2.4, 1.2, 0.06, 0.14, 2.4, 0.12); add(BX, wood, -1.2, 1.2, 0.06, 0.14, 2.4, 0.12);
+  add(BX, wood, -1.8, 2.35, 0.06, 1.34, 0.14, 0.12);
+  add(BX, new T.MeshBasicMaterial({ color: M.col('#ffb070').multiplyScalar(1.4) }), -1.8, 1.1, 0.03, 1.0, 2.1, 0.02);
+  const hinge = new T.Group(); hinge.position.set(-2.3, 0, 0.1); bk.add(hinge);
+  const door = new T.Mesh(BX, M.mat.std('#5a2f1c', 0.7, { map: M.tex.wood() })); door.position.set(0.5, 1.1, 0); door.scale.set(1, 2.1, 0.07);
+  door.castShadow = true; hinge.add(door);
+  // 招牌
+  const signTex = M.canvasTex('sign', 256, (g, s) => {
+    g.fillStyle = '#3a2214'; g.fillRect(0, 0, s, s); g.strokeStyle = '#d9a650'; g.lineWidth = 8; g.strokeRect(10, 10, s - 20, s - 20);
+    g.fillStyle = '#e8b45a'; g.beginPath(); g.ellipse(s / 2, s * 0.4, s * 0.26, s * 0.14, 0, 0, PI * 2); g.fill();
+    g.strokeStyle = '#8a5a26'; g.lineWidth = 5; for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(s / 2 + i * 34 - 10, s * 0.32); g.lineTo(s / 2 + i * 34 + 10, s * 0.48); g.stroke(); }
+    g.fillStyle = '#f2d9a8'; g.font = 'bold 54px serif'; g.textAlign = 'center'; g.fillText('面包房', s / 2, s * 0.82);
+  }, { clamp: true });
+  add(BX, M.mat.std('#1a1a1e', 0.5, { metal: 0.6 }), 0.6, 3.75, 0.55, 0.05, 0.05, 1.1);
+  const signMat = new T.MeshStandardMaterial({ map: signTex, roughness: 0.7 });
+  for (const s of [1, -1]) {
+    const sign = new T.Mesh(new T.PlaneGeometry(0.85, 0.85), signMat);
+    sign.position.set(0.6 + s * 0.01, 3.25, 0.75); sign.rotation.y = s * PI / 2; bk.add(sign);
+  }
+  M.colliders.push({ x: -3.35, z: -12.6, r: 1.25 }, { x: -3.6, z: -11.5, r: 0.8 }, { x: -3.6, z: -13.8, r: 0.8 });
+  bk.updateMatrixWorld(true);
+  M.bakery = { group: bk, items, hinge, roomMat, doorOut: bk.localToWorld(new T.Vector3(-1.8, 0, 0.9)),
+    window: bk.localToWorld(new T.Vector3(0.6, 1.3, 0.8)) };
+  M.lights.pool(-2.6, -12.6, '#ffa860', 2.4, 0.9);
+
+  // ---- 合并 + 窗户 + 窗光光斑 ----
+  M.batch.flush();
+  M.house.flushWindows();
+  M.town.pools.slice(0, 60).forEach(p => M.lights.pool(p.x, p.z, '#ffa860', 1.7, 0.5));
+  M.town.doorLamps.forEach(p => M.lights.pool(p.x, p.z, '#ffb070', 2.2, 0.7));
+})();
+// ===== 06-canal.js：运河水面、岸墙、系船柱、木船、桥 =====
+(() => {
+  const PI = Math.PI;
+  // 路灯布局（07 用来摆路灯，这里用来画水面倒影光柱）
+  M.layout = {
+    lamps: [[5.0, 15], [5.0, 6], [5.0, -3], [5.0, -12], [5.2, -23], [5.2, -17], [5.0, -30], [5.0, -39],
+      [15.6, 20], [15.6, 4], [15.6, -12], [15.6, -30], [-8, -48], [18, -48], [-8, -60], [18, -60]],
+  };
+  // ---- 水面 ----
+  const lights = M.layout.lamps.slice(0, 16).map(([x, z]) => new T.Vector3(x, 3.4, z));
+  const U = T.UniformsUtils.merge([T.UniformsLib.fog, {
+    uTime: { value: 0 }, uDawn: { value: 0 }, uL: { value: lights }, uCamPos: { value: new T.Vector3() },
+  }]);
+  const water = new T.Mesh(new T.PlaneGeometry(8.8, 76, 1, 1), new T.ShaderMaterial({
+    uniforms: U, fog: true,
+    vertexShader: `varying vec3 vWP; #include <fog_pars_vertex>
+      void main(){ vec4 wp = modelMatrix*vec4(position,1.); vWP = wp.xyz; vec4 mvPosition = viewMatrix*wp;
+        gl_Position = projectionMatrix*mvPosition; #include <fog_vertex> }`.replace(/#include <(\w+)>/g, '\n#include <$1>\n'),
+    fragmentShader: (M.glslNoise + `
+      uniform float uTime, uDawn; uniform vec3 uL[16]; uniform vec3 uCamPos; varying vec3 vWP;
+      #include <fog_pars_fragment>
+      vec3 lin(vec3 c){ return pow(c, vec3(2.2)); }
+      void main(){
+        vec2 p = vWP.xz;
+        float w1 = fbm(p*vec2(.9,.35) + vec2(uTime*.05, uTime*.12));
+        float w2 = noise(p*3.1 - uTime*.25);
+        vec2 wob = vec2(w1-.5, w2-.5);
+        vec3 V = normalize(uCamPos - vWP);
+        float fres = .04 + .96*pow(1.-max(V.y,0.), 5.);
+        vec3 col = mix(lin(vec3(.03,.05,.1)), lin(vec3(.14,.2,.34)), fres);
+        col = mix(col, lin(vec3(.35,.45,.6)), uDawn*.6);
+        for (int i=0;i<16;i++){
+          vec3 L = uL[i];
+          vec2 a = L.xz, b = uCamPos.xz; vec2 ab = b-a; float len = max(length(ab), .01); vec2 dir = ab/len;
+          vec2 q = p + wob*.35 - a; float t = dot(q, dir); float perp = abs(q.x*dir.y - q.y*dir.x);
+          float along = smoothstep(-.6, .3, t) * exp(-max(t,0.)*.16);
+          float width = .12 + max(t,0.)*.035;
+          float s = smoothstep(width, 0., perp) * along * (.55 + .9*noise(vec2(t*4.-uTime*1.5, perp*9.)));
+          col += lin(vec3(1.,.66,.33)) * s * 1.6 * (1.-uDawn);
+        }
+        float ice = smoothstep(.62, .66, fbm(p*.6 + vec2(0., uTime*.02)));
+        col = mix(col, lin(vec3(.62,.68,.8))*(.6+.4*uDawn+.3*(1.-uDawn)), ice*.75);
+        gl_FragColor = vec4(col, 1.);
+        #include <fog_fragment>
+      }`).replace(/#include <(\w+)>/g, '\n#include <$1>\n'),
+  }));
+  water.rotation.x = -PI / 2; water.position.set(10, -1.3, -7);
+  M.scene.add(water);
+  M.canal = { water, uniforms: U };
+  M.onFrame(() => { U.uTime.value = M.time; U.uCamPos.value.copy(M.camera.position); }, 80);
+
+  // ---- 岸墙、尽头墙 ----
+  const stone = M.mat.std('#6e6a66', 0.9, { map: M.tex.stone() }), iron = M.mat.std('#18181c', 0.45, { metal: 0.5 });
+  const B = (mat, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0) => M.batch.add(M.unitBox, mat, M.mtx(x, y, z, rx, ry, rz, sx, sy, sz));
+  B(stone, 5.8, -0.8, -7, 0.4, 1.7, 74); B(stone, 14.2, -0.8, -7, 0.4, 1.7, 74);
+  B(stone, 10, -0.8, -44.1, 8.8, 1.7, 0.4); B(stone, 10, -0.8, 30.1, 8.8, 1.7, 0.4);
+  B(M.mat.std('#8a857c', 0.85), 5.82, 0.04, -7, 0.52, 0.1, 74); B(M.mat.std('#8a857c', 0.85), 14.18, 0.04, -7, 0.52, 0.1, 74);
+  B(M.mat.snow, 5.8, 0.11, -7, 0.46, 0.06, 74); B(M.mat.snow, 14.2, 0.11, -7, 0.46, 0.06, 74);
+  for (let x = 5.9; x <= 14.2; x += 0.9) B(iron, x, 0.45, -44.1, 0.05, 0.9, 0.05);
+  B(iron, 10, 0.9, -44.1, 8.6, 0.05, 0.05); B(M.mat.snow, 10, 0.94, -44.1, 8.6, 0.04, 0.08);
+
+  // ---- 系船柱 ----
+  const bol = new T.CylinderGeometry(0.13, 0.16, 0.55, 12), cap = new T.SphereGeometry(0.17, 12, 6, 0, PI * 2, 0, PI / 2);
+  for (let z = 16; z > -43; z -= 4) {
+    if (z > -23.5 && z < -16.5) continue;
+    M.batch.add(bol, iron, M.mtx(5.3, 0.27, z)); M.batch.add(cap, iron, M.mtx(5.3, 0.54, z));
+    M.batch.add(cap, M.mat.snow, M.mtx(5.3, 0.6, z, 0, 0, 0, 0.9, 0.5, 0.9));
+    M.colliders.push({ x: 5.3, z, r: 0.28 });
+  }
+
+  // ---- 桥 ----
+  const arch = new T.Shape();
+  arch.moveTo(5.6, -1.6); arch.lineTo(5.6, -0.05); arch.lineTo(14.4, -0.05); arch.lineTo(14.4, -1.6); arch.lineTo(13.4, -1.6);
+  arch.absellipse(10, -1.6, 3.4, 1.15, 0, PI, false); arch.lineTo(5.6, -1.6);
+  const ag = new T.ExtrudeGeometry(arch, { depth: 3, bevelEnabled: false, curveSegments: 24 });
+  const auv = ag.attributes.uv; for (let i = 0; i < auv.count; i++) auv.setXY(i, auv.getX(i) * 0.25, auv.getY(i) * 0.25);
+  M.batch.add(ag, stone, M.mtx(0, 0, -21.5));
+  B(M.mat.std('#7a756e', 0.85, { map: M.tex.stone() }), 10, -0.02, -20, 8.9, 0.1, 3.1);
+  for (const z of [-21.42, -18.58]) {
+    for (let x = 5.8; x <= 14.25; x += 0.7) B(iron, x, 0.5, z, 0.05, 1.0, 0.05);
+    B(iron, 10, 1.0, z, 8.7, 0.06, 0.06); B(iron, 10, 0.55, z, 8.7, 0.03, 0.03); B(M.mat.snow, 10, 1.05, z, 8.7, 0.05, 0.1);
+  }
+
+  // ---- 木船 ----
+  const hullGeo = (L, W) => {
+    const s = new T.Shape([new T.Vector2(-W / 2, 0.55), new T.Vector2(-W * 0.46, 0.1), new T.Vector2(-W * 0.3, -0.3),
+      new T.Vector2(W * 0.3, -0.3), new T.Vector2(W * 0.46, 0.1), new T.Vector2(W / 2, 0.55)]);
+    const g = new T.ExtrudeGeometry(s, { depth: L, steps: 18, bevelEnabled: false }); g.translate(0, 0, -L / 2);
+    const p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const t = Math.abs(p.getZ(i)) / (L / 2), k = 1 - Math.pow(t, 2.6) * 0.92;
+      p.setX(i, p.getX(i) * k); p.setY(i, p.getY(i) + Math.pow(t, 2) * 0.35 * (p.getY(i) > 0.3 ? 1 : 0.4));
+    }
+    g.computeVertexNormals(); return g;
+  };
+  const boats = [];
+  const specs = [[7.5, 12, '#5a3a24', 1], [12.5, 4, '#2f4a66', 0], [7.4, -6, '#7a2a22', 1], [12.6, -30, '#3d5a3a', 1],
+    [7.5, -36, '#6a4a2a', 0], [12.5, 20, '#5a3a24', 1], [12.6, -12, '#7a5a3a', 0]];
+  const sail = M.mat.std('#cfc8b8', 0.95), deckM = M.mat.std('#8a6a4a', 0.8, { map: M.tex.wood() });
+  const planks = M.tex.planks(), trimB = M.mat.std('#e2d6bc', 0.6), brass = M.mat.std('#b08a3a', 0.35, { metal: 0.6 });
+  const cabWin = new T.MeshBasicMaterial({ color: M.col('#ffc070').multiplyScalar(2.2) });
+  const glowM = new T.SpriteMaterial({ map: M.tex.soft(), color: M.col('#ffb060').multiplyScalar(1.4), transparent: true, opacity: 0.55,
+    blending: T.AdditiveBlending, depthWrite: false });
+  specs.forEach(([x, z, col, mast], i) => {
+    const L = 5 + (i % 3), W = 1.8, g = new T.Group();
+    const hull = new T.Mesh(hullGeo(L, W), M.mat.std(col, 0.65, { map: planks })); hull.castShadow = hull.receiveShadow = true; g.add(hull);
+    const band = new T.Mesh(hullGeo(L * 1.002, W * 1.02), trimB); band.scale.set(1, 0.06, 1); band.position.y = 0.36; g.add(band);
+    const deck = new T.Mesh(M.unitBox, deckM); deck.scale.set(W * 0.82, 0.05, L * 0.62); deck.position.y = 0.5; g.add(deck);
+    const sn = new T.Mesh(M.unitBox, M.mat.snow); sn.scale.set(W * 0.7, 0.06, L * 0.45); sn.position.set(0, 0.55, -L * 0.05); g.add(sn);
+    const rim = new T.Mesh(M.unitBox, M.mat.std('#d8cbb0', 0.7)); rim.scale.set(W * 1.01, 0.08, L * 0.6); rim.position.y = 0.42; g.add(rim);
+    if (mast) {
+      const m = new T.Mesh(new T.CylinderGeometry(0.05, 0.07, 5, 8), deckM); m.position.set(0, 3, L * 0.12); m.castShadow = true; g.add(m);
+      const boom = new T.Mesh(new T.CylinderGeometry(0.16, 0.16, L * 0.5, 10), sail); boom.rotation.x = PI / 2;
+      boom.position.set(0, 1.5, -L * 0.1); boom.castShadow = true; g.add(boom);
+      const bs = new T.Mesh(new T.CylinderGeometry(0.17, 0.17, L * 0.48, 10, 1, false, 0, PI), M.mat.snow);
+      bs.rotation.set(PI / 2, 0, PI / 2); bs.position.copy(boom.position).y += 0.02; g.add(bs);
+    } else {
+      const cab = new T.Mesh(M.unitBox, M.mat.std('#d8cbb0', 0.85)); cab.scale.set(1.1, 0.7, 1.4); cab.position.set(0, 0.85, -L * 0.15);
+      cab.castShadow = true; g.add(cab);
+      const cs = new T.Mesh(M.unitBox, M.mat.snow); cs.scale.set(1.2, 0.08, 1.5); cs.position.set(0, 1.24, -L * 0.15); g.add(cs);
+      for (const sx of [-1, 1]) for (const dz of [-0.35, 0.3]) {
+        const w = new T.Mesh(M.unitBox, cabWin); w.scale.set(0.02, 0.24, 0.32); w.position.set(sx * 0.56, 0.92, -L * 0.15 + dz); g.add(w);
+      }
+      const lampP = new T.Vector3(0.45, 1.5, L * 0.32);
+      const pole = new T.Mesh(new T.CylinderGeometry(0.02, 0.02, 0.9, 6), brass); pole.position.set(lampP.x, 1.0, lampP.z); g.add(pole);
+      const bulb = new T.Mesh(new T.SphereGeometry(0.06, 10, 8), cabWin); bulb.position.copy(lampP); g.add(bulb);
+      const glow = new T.Sprite(glowM); glow.scale.setScalar(1.1); glow.position.copy(lampP); g.add(glow);
+    }
+    g.position.set(x, -1.42, z); g.rotation.y = (i % 2 ? 0.04 : -0.03);
+    g.userData = { ph: i * 1.7, y: -1.42 }; M.scene.add(g); boats.push(g);
+  });
+  M.onFrame(() => {
+    for (const b of boats) {
+      const t = M.time * 0.7 + b.userData.ph;
+      b.position.y = b.userData.y + Math.sin(t) * 0.035; b.rotation.z = Math.sin(t * 0.8 + 1) * 0.025; b.rotation.x = Math.sin(t * 0.6) * 0.01;
+    }
+  }, 60);
+})();
+// ===== 06b-firgen.js：冷杉生成器（枝条卡片实例化 + 积雪卡片 + 针叶形阴影）=====
+(() => {
+  const PI = Math.PI;
+  const needleTex = M.canvasTex('needles', 256, (g, s) => {
+    const r = M.rand(31), H = s / 2, cy = H / 2;
+    g.clearRect(0, 0, s, s);
+    const greens = ['#2a5f40', '#36704b', '#204d35', '#457f57'];
+    const twig = (x0, y0, x1, y1, len, n) => {
+      g.strokeStyle = '#4a3624'; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+      for (let i = 0; i < n; i++) {
+        const t = i / n, x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t, l = len * (1 - t * 0.55) * (0.7 + r() * 0.5);
+        if (t < 0.1 && r() < 0.6) continue;
+        g.strokeStyle = greens[(r() * 4) | 0]; g.lineWidth = 3 + r() * 1.5;
+        for (const sd of [-1, 1]) { const a = Math.atan2(y1 - y0, x1 - x0) + sd * (0.9 + r() * 0.4);
+          g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke(); }
+      }
+    };
+    twig(0, cy, s, cy, H * 0.46, 110);
+    for (let k = 0; k < 5; k++) { const x = s * (0.18 + k * 0.15), sd = k % 2 ? 1 : -1;
+      twig(x, cy, x + s * 0.22, cy + sd * H * 0.34, H * 0.24, 26); }
+  }, { clamp: true });
+  const snowTex = M.canvasTex('branchSnow', 256, (g, s) => {
+    const r = M.rand(57), H = s / 2, cy = H / 2; g.clearRect(0, 0, s, s);
+    for (let i = 0; i < 26; i++) {
+      const x = s * (0.1 + r() * 0.85), y = cy + (r() - 0.5) * H * 0.5 * (1 - x / s * 0.5), rr = 12 + r() * 16 * (1 - x / s * 0.6);
+      const n = 6 + ((r() * 4) | 0);
+      for (let j = 0; j < n; j++) {
+        const a = r() * PI * 2, d = r() * rr * 0.8, cx = x + Math.cos(a) * d * 1.4, cy2 = y + Math.sin(a) * d * 0.7, r2 = rr * (0.3 + r() * 0.35);
+        const gr = g.createRadialGradient(cx, cy2, 0, cx, cy2, r2); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.75, '#eef3ff'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = gr; g.beginPath(); g.arc(cx, cy2, r2, 0, PI * 2); g.fill();
+      }
+    }
+  }, { clamp: true });
+
+  // 枝条几何：沿 +X，中脉折起，枝梢下垂；UV 只用贴图上半
+  const branchGeo = (() => {
+    const g = new T.PlaneGeometry(1, 0.62, 5, 2); g.rotateX(-PI / 2); g.translate(0.5, 0, 0);
+    const p = g.attributes.position, uv = g.attributes.uv;
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), z = p.getZ(i), w = 1 - Math.abs(z) / 0.31;
+      p.setY(i, w * 0.08 * (1 - x * 0.6) - 0.18 * x * x);
+      p.setZ(i, z * (1 - x * 0.45));
+      uv.setY(i, 0.5 + uv.getY(i) * 0.5);
+    }
+    g.computeVertexNormals(); return g;
+  })();
+  const mkMat = (map, color, rough) => {
+    const m = new T.MeshStandardMaterial({ map, color: M.col(color), roughness: rough, alphaTest: 0.45, side: T.DoubleSide });
+    return m;
+  };
+  const leafMat = mkMat(needleTex, '#ffffff', 0.9), snowMat = mkMat(snowTex, '#e8eefb', 0.6);
+  const depthOf = map => new T.MeshDepthMaterial({ depthPacking: T.RGBADepthPacking, map, alphaTest: 0.45 });
+
+  const leaves = [], snows = [], cores = [];
+  const q = new T.Quaternion(), e = new T.Euler(), v = new T.Vector3(), sc = new T.Vector3();
+  M.firgen = {};
+  M.firgen.tree = (x, z, h, opts = {}) => {
+    const r = M.rand(opts.seed || (x * 131 + z * 17) | 0), Rb = opts.radius || h * 0.33, tips = [];
+    const whorls = Math.round(h * 2.4), per = opts.per || (h > 7 ? 11 : 8);
+    const branch = (y, yaw, len, droop, shade, snowy) => {
+      e.set((r() - 0.5) * 0.4, yaw, -droop, 'YZX'); q.setFromEuler(e);
+      const m = new T.Matrix4().compose(v.set(x, y, z), q, sc.set(len, len * 0.9, len * (0.8 + r() * 0.3)));
+      leaves.push({ m, c: shade });
+      if (snowy) { const ms = m.clone(); ms.multiply(new T.Matrix4().makeTranslation(0.04, 0.045, 0)).multiply(new T.Matrix4().makeScale(0.9, 1, 0.85)); snows.push(ms); }
+      const tip = new T.Vector3(1, -0.18, 0).applyMatrix4(m); tips.push(tip);
+    };
+    for (let i = 0; i < whorls; i++) {
+      const t = i / whorls, y = h * (0.16 + t * 0.8), R = Rb * Math.pow(1 - t, 0.85) + 0.15, rot = r() * PI * 2;
+      const n = Math.max(4, Math.round(per * (1 - t * 0.5)));
+      for (let k = 0; k < n; k++) {
+        const yaw = rot + k / n * PI * 2 + (r() - 0.5) * 0.3, droop = 0.22 + 0.35 * (1 - t) + r() * 0.1;
+        branch(y, yaw, R * (0.85 + r() * 0.25), droop, 0.55 + 0.4 * t + r() * 0.08, r() < 0.3 + 0.35 * t);
+        if (r() < 0.6) branch(y - h * 0.18 / whorls, yaw + PI / n, R * 0.6, droop + 0.1, 0.45 + 0.35 * t, false);
+      }
+    }
+    cores.push({ x, z, h, r: Math.max(0.15, h * 0.11) });
+    M.colliders.push({ x, z, r: opts.collide || h * 0.11 + 0.25 });
+    return { tips };
+  };
+  M.firgen.flush = () => {
+    const li = new T.InstancedMesh(branchGeo, leafMat, leaves.length), col = new T.Color();
+    leaves.forEach((b, i) => { li.setMatrixAt(i, b.m); li.setColorAt(i, col.setRGB(b.c * 0.95, b.c, b.c * 0.92)); });
+    li.instanceColor.needsUpdate = true; li.castShadow = li.receiveShadow = true; li.customDepthMaterial = depthOf(needleTex);
+    M.scene.add(li);
+    const si = new T.InstancedMesh(branchGeo, snowMat, Math.max(1, snows.length));
+    snows.forEach((m, i) => si.setMatrixAt(i, m)); si.count = snows.length; si.receiveShadow = true; M.scene.add(si);
+    const coreGeo = new T.ConeGeometry(1, 1, 10), coreMat = M.mat.std('#122a1e', 0.95), trunk = M.mat.std('#3a2618', 0.9);
+    const trunkGeo = new T.CylinderGeometry(0.6, 1, 1, 8);
+    for (const c of cores) {
+      M.batch.add(coreGeo, coreMat, M.mtx(c.x, c.h * 0.58, c.z, 0, 0, 0, c.r * 0.6, c.h * 0.8, c.r * 0.6));
+      M.batch.add(trunkGeo, trunk, M.mtx(c.x, c.h * 0.1, c.z, 0, 0, 0, c.r * 0.35, c.h * 0.2, c.r * 0.35));
+    }
+    M.firgen.mesh = li;
+  };
+})();
+// ===== 07-props.js：路灯、木桶、木箱、长椅、冷杉、暖炉亭、圣诞树 =====
+(() => {
+  const PI = Math.PI, r = M.rand(77);
+  const iron = M.mat.std('#18181c', 0.45, { metal: 0.5 }), wood = M.mat.std('#6a4a2e', 0.8, { map: M.tex.wood() });
+  const darkWood = M.mat.std('#3e2a1c', 0.8, { map: M.tex.wood() });
+  const B = (mat, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0) => M.batch.add(M.unitBox, mat, M.mtx(x, y, z, rx, ry, rz, sx, sy, sz));
+  const G = (geo, mat, x, y, z, rx = 0, ry = 0, rz = 0, sx = 1, sy = 1, sz = 1) => M.batch.add(geo, mat, M.mtx(x, y, z, rx, ry, rz, sx, sy, sz));
+  M.props = { pools: [] };
+
+  // ---- 路灯 ----
+  const lampMat = new T.MeshBasicMaterial({ color: M.col('#ffcf88').multiplyScalar(3.2) });
+  M.props.lampMat = lampMat;
+  const baseGeo = new T.LatheGeometry([[0.2, 0], [0.22, 0.12], [0.14, 0.24], [0.1, 0.55], [0.07, 0.62], [0.06, 0.7]].map(p => new T.Vector2(...p)), 12);
+  const post = new T.CylinderGeometry(0.05, 0.06, 2.5, 8), glassG = new T.CylinderGeometry(0.2, 0.13, 0.42, 4, 1);
+  const capG = new T.ConeGeometry(0.3, 0.28, 4), finial = new T.SphereGeometry(0.05, 8, 6), ring = new T.CylinderGeometry(0.15, 0.12, 0.08, 8);
+  M.lamp = (x, z) => {
+    G(baseGeo, iron, x, 0, z); G(post, iron, x, 1.95, z); G(ring, iron, x, 3.2, z);
+    G(glassG, lampMat, x, 3.45, z, 0, PI / 4); 
+    for (let i = 0; i < 4; i++) { const a = PI / 4 + i * PI / 2; B(iron, x + Math.cos(a) * 0.17, 3.45, z + Math.sin(a) * 0.17, 0.03, 0.45, 0.03); }
+    G(capG, iron, x, 3.8, z, 0, PI / 4); G(capG, M.mat.snow, x, 3.84, z, 0, PI / 4, 0, 0.85, 0.7, 0.85); G(finial, iron, x, 4.0, z);
+    M.props.pools.push(M.lights.pool(x, z, '#ffb26b', 3.8, 1.0));
+    M.colliders.push({ x, z, r: 0.25 });
+  };
+  M.layout.lamps.forEach(([x, z]) => M.lamp(x, z));
+
+  // ---- 木桶 ----
+  const barrel = new T.LatheGeometry(Array.from({ length: 9 }, (_, i) => new T.Vector2(0.3 + 0.05 * Math.sin(PI * i / 8), i * 0.1)), 14);
+  const hoop = new T.TorusGeometry(0.33, 0.018, 4, 18), lid = new T.CylinderGeometry(0.31, 0.31, 0.06, 14);
+  const barrels = [[-3.0, 3.6], [-2.5, 4.3], [-3.05, 4.5], [4.6, -7.2], [-3.0, -24.5], [-2.45, -25], [4.5, -35.5], [15.3, 10], [-9.5, -52]];
+  barrels.forEach(([x, z]) => {
+    G(barrel, wood, x, 0, z); G(hoop, iron, x, 0.18, z, PI / 2); G(hoop, iron, x, 0.62, z, PI / 2);
+    G(lid, M.mat.snow, x, 0.83, z, 0, 0, 0, 0.95, 1, 0.95); M.colliders.push({ x, z, r: 0.42 });
+  });
+
+  // ---- 木箱 ----
+  [[-2.9, -16.6, 0, 0.75], [-2.9, -17.45, 0, 0.7], [-2.9, -16.95, 0.72, 0.6], [4.7, -9, 0, 0.7], [4.7, -9, 0.7, 0.55], [-3.0, 11.6, 0, 0.6]]
+    .forEach(([x, z, y, s]) => {
+      const rot = (r() - 0.5) * 0.4;
+      B(darkWood, x, y + s / 2, z, s, s, s, 0, rot); B(M.mat.snow, x, y + s + 0.03, z, s * 0.9, 0.06, s * 0.9, 0, rot);
+      if (y === 0) M.colliders.push({ x, z, r: s * 0.7 });
+    });
+
+  // ---- 长椅 ----
+  const bench = (x, z) => {
+    for (let i = 0; i < 3; i++) B(wood, x + 0.1 * i - 0.1, 0.45, z, 0.09, 0.05, 1.8);
+    B(wood, x - 0.25, 0.75, z, 0.05, 0.35, 1.8);
+    for (const dz of [-0.75, 0.75]) { B(iron, x, 0.22, z + dz, 0.4, 0.45, 0.05); B(iron, x - 0.25, 0.6, z + dz, 0.05, 0.5, 0.05); }
+    B(M.mat.snow, x, 0.5, z, 0.32, 0.05, 1.7);
+    M.colliders.push({ x, z: z - 0.5, r: 0.45 }, { x, z: z + 0.5, r: 0.45 });
+  };
+  bench(-3.0, -1.5); bench(-3.0, -32);
+
+  // ---- 冷杉 ----
+  M.fir = (x, z, h) => M.firgen.tree(x, z, h);
+  [[-2.8, 17.6, 4.2], [4.9, 17.6, 3.6], [-2.9, -41, 4], [-10, -46, 5], [20, -46.5, 4.5], [-10.5, -62, 5.5], [20.5, -62, 5], [15.2, -40, 3.4]]
+    .forEach(([x, z, h]) => M.fir(x, z, h));
+
+  // ---- 暖炉亭（站点 1）----
+  const kx = -1, kz = 9;
+  for (const [dx, dz, h] of [[-1.0, -0.95, 2.5], [-1.0, 0.95, 2.5], [1.0, -0.95, 2.2], [1.0, 0.95, 2.2]]) {
+    B(darkWood, kx + dx, h / 2, kz + dz, 0.12, h, 0.12); M.colliders.push({ x: kx + dx, z: kz + dz, r: 0.15 });
+  }
+  const tilt = -Math.atan2(0.3, 2.0);
+  B(M.mat.std('#4a3020', 0.8, { map: M.tex.wood() }), kx, 2.42, kz, 2.5, 0.1, 2.3, 0, 0, tilt);
+  B(M.mat.snow, kx, 2.51, kz, 2.4, 0.08, 2.2, 0, 0, tilt);
+  B(darkWood, kx - 1.0, 2.5, kz, 0.1, 0.16, 2.0); B(darkWood, kx + 1.0, 2.2, kz, 0.1, 0.16, 2.0);
+  const stoveProfile = [[0, 0.15], [0.28, 0.15], [0.38, 0.3], [0.44, 0.55], [0.4, 0.82], [0.28, 0.98], [0.12, 1.04], [0.1, 1.1]];
+  G(new T.LatheGeometry(stoveProfile.map(p => new T.Vector2(...p)), 16), iron, kx, 0, kz);
+  for (let i = 0; i < 3; i++) { const a = i * PI * 2 / 3; B(iron, kx + Math.cos(a) * 0.25, 0.08, kz + Math.sin(a) * 0.25, 0.06, 0.16, 0.06); }
+  G(new T.CylinderGeometry(0.08, 0.08, 1.8, 8), iron, kx, 1.95, kz);
+  G(new T.CylinderGeometry(0.11, 0.11, 0.15, 8), iron, kx, 2.95, kz);
+  const doorMat = new T.MeshBasicMaterial({ color: M.col('#2a1008') });
+  const stoveDoor = new T.Mesh(new T.CircleGeometry(0.17, 16), doorMat);
+  stoveDoor.position.set(kx + 0.455, 0.56, kz); stoveDoor.rotation.y = PI / 2; M.scene.add(stoveDoor);
+  for (let i = 0; i < 5; i++) G(new T.CylinderGeometry(0.07, 0.07, 0.6, 7), M.mat.std('#7a5236', 0.9), kx - 0.6, 0.08 + (i % 2) * 0.12, kz + 0.75 + i * 0.07, PI / 2, 0, PI / 2);
+  M.colliders.push({ x: kx, z: kz, r: 0.6 });
+  M.props.stove = { pos: new T.Vector3(kx, 0.6, kz), door: stoveDoor, doorMat, focus: new T.Vector3(kx + 0.5, 0.6, kz) };
+
+  // ---- 圣诞树（站点 3）----
+  const tx = 4, tz = -54, TH = 9.5;
+  const { tips } = M.firgen.tree(tx, tz, TH, { radius: 3.7, per: 13, collide: 2.6, seed: 2026 });
+  const rc = M.rand(88), pool = tips.filter(p => p.y > 0.9).sort(() => rc() - 0.5);
+  const candles = pool.slice(0, 140).map(p => p.clone().add(new T.Vector3(0, 0.05, 0)));
+  const star = new T.Shape();
+  for (let i = 0; i < 10; i++) { const a = PI / 2 + i * PI / 5, rr = i % 2 ? 0.22 : 0.55; star[i ? 'lineTo' : 'moveTo'](Math.cos(a) * rr, Math.sin(a) * rr); }
+  const starMat = new T.MeshStandardMaterial({ color: M.col('#c9a24a'), metalness: 0.7, roughness: 0.3, emissive: M.col('#ffcc55'), emissiveIntensity: 0 });
+  const starMesh = new T.Mesh(new T.ExtrudeGeometry(star, { depth: 0.1, bevelEnabled: false }), starMat);
+  starMesh.position.set(tx, TH + 0.6, tz); M.scene.add(starMesh);
+  M.props.tree = { pos: new T.Vector3(tx, 0, tz), candles, star: starMesh, starMat, top: new T.Vector3(tx, TH + 0.6, tz) };
+  for (let i = 0; i < 6; i++) { const a = i * PI / 3 + 0.3; B(M.mat.std('#7a2a22', 0.6), tx + Math.cos(a) * 2.9, 0.18, tz + Math.sin(a) * 2.9, 0.4, 0.36, 0.4, 0, a);
+    B(M.mat.std('#d9b44a', 0.4), tx + Math.cos(a) * 2.9, 0.37, tz + Math.sin(a) * 2.9, 0.42, 0.04, 0.1, 0, a); }
+
+  M.firgen.flush();
+  M.batch.flush();
+})();
+// ===== 07c-girl-look.js：小女孩脸部贴图、边缘光、针织/格纹布料 =====
+(() => {
+  const PI = Math.PI;
+  const L = M.girlLook = { rimU: { uRimCold: { value: M.col('#8fb0ff') }, uRimWarm: { value: 0 }, uSnow: { value: 0 } } };
+
+  // ---- 脸：贴在头部椭球前方的一片球面上；拆成 底层 / 眼珠 / 眼睑 三层，眼珠可平移看向 ----
+  const SX = 0.7; // 贴片横向角度比纵向大，横向尺寸需压缩才显得圆
+  const EYE = sd => ({ ex: 256 + sd * 102, ey: 236 });
+  const drawBase = (g, s) => {
+    g.clearRect(0, 0, s, s);
+    const blush = (x, y) => { const gr = g.createRadialGradient(x, y, 0, x, y, 46);
+      gr.addColorStop(0, 'rgba(255,120,120,0.55)'); gr.addColorStop(1, 'rgba(255,120,120,0)'); g.fillStyle = gr;
+      g.save(); g.translate(x, y); g.scale(SX, 0.7); g.translate(-x, -y); g.beginPath(); g.arc(x, y, 46, 0, PI * 2); g.fill(); g.restore(); };
+    blush(256 - 165, 338); blush(256 + 165, 338);
+    for (const sd of [-1, 1]) {
+      const { ex } = EYE(sd);
+      g.strokeStyle = '#5a3020'; g.lineWidth = 6; g.lineCap = 'round';
+      g.beginPath(); g.ellipse(ex + sd * 4, 140, 34 * SX, 12, sd * 0.12, PI * 1.12, PI * 1.88); g.stroke();
+      // 眼白的淡阴影，让眼珠移动时有"眼眶"
+      const { ey } = EYE(sd); g.fillStyle = 'rgba(255,250,245,0.55)';
+      g.save(); g.translate(ex, ey); g.scale(SX * 1.3, 1.3); g.beginPath(); g.ellipse(0, 2, 47, 52, 0, 0, PI * 2); g.fill(); g.restore();
+    }
+    const nose = g.createRadialGradient(256, 300, 0, 256, 300, 16); nose.addColorStop(0, 'rgba(190,110,90,0.5)'); nose.addColorStop(1, 'rgba(190,110,90,0)');
+    g.fillStyle = nose; g.fillRect(230, 278, 52, 44);
+    g.strokeStyle = '#8a3426'; g.lineWidth = 6; g.lineCap = 'round';
+    g.beginPath(); g.ellipse(256, 392, 22 * SX, 12, 0, PI * 0.15, PI * 0.85); g.stroke();
+  };
+  const drawEyes = (g, s) => {
+    g.clearRect(0, 0, s, s);
+    for (const sd of [-1, 1]) {
+      const { ex, ey } = EYE(sd);
+      g.save(); g.translate(ex, ey); g.scale(SX * 1.3, 1.3);
+      const ir = g.createLinearGradient(0, -40, 0, 40); ir.addColorStop(0, '#20120b'); ir.addColorStop(0.55, '#4a2c1a'); ir.addColorStop(1, '#8a5a32');
+      g.fillStyle = ir; g.beginPath(); g.ellipse(0, 4, 36, 42, 0, 0, PI * 2); g.fill();
+      g.fillStyle = '#120a06'; g.beginPath(); g.ellipse(0, 6, 18, 23, 0, 0, PI * 2); g.fill();
+      g.fillStyle = '#ffffff'; g.beginPath(); g.ellipse(-sd * 11 - 2, -12, 12, 14, 0, 0, PI * 2); g.fill();
+      g.beginPath(); g.ellipse(sd * 13, 22, 5.5, 5.5, 0, 0, PI * 2); g.fill();
+      g.restore();
+    }
+  };
+  const drawLids = closed => (g, s) => {
+    g.clearRect(0, 0, s, s); g.lineCap = 'round';
+    for (const sd of [-1, 1]) {
+      const { ex, ey } = EYE(sd);
+      if (closed) { g.strokeStyle = '#2a160e'; g.lineWidth = 8; g.beginPath(); g.ellipse(ex, ey + 8, 46 * SX, 16, 0, PI * 0.1, PI * 0.9); g.stroke(); continue; }
+      g.save(); g.translate(ex, ey); g.scale(SX * 1.3, 1.3);
+      g.strokeStyle = '#1a0d08'; g.lineWidth = 9; g.beginPath(); g.ellipse(0, 4, 44, 50, 0, PI * 1.08, PI * 1.92); g.stroke();
+      g.lineWidth = 5;
+      for (let k = 0; k < 3; k++) { const a = PI * (sd > 0 ? 1.82 + k * 0.07 : 1.18 - k * 0.07);
+        const x0 = Math.cos(a) * 44, y0 = 4 + Math.sin(a) * 50;
+        g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + sd * 14, y0 - 10); g.stroke(); }
+      g.restore();
+    }
+  };
+  const mkTex = (name, draw) => { const t = M.canvasTex(name, 512, draw, { clamp: false });
+    t.wrapS = T.RepeatWrapping; t.repeat.x = -1; t.offset.x = 1; return t; };
+  const baseT = mkTex('faceBase', drawBase), eyesT = mkTex('faceEyes', drawEyes);
+  const lidOpen = mkTex('faceLidOpen', drawLids(false)), lidShut = mkTex('faceLidShut', drawLids(true));
+  L.face = (head) => {
+    const geo = new T.SphereGeometry(1, 32, 20, PI / 2 - 0.95, 1.9, PI * 0.3, PI * 0.42);
+    const layer = (map, k, ei, order) => {
+      const m = new T.MeshStandardMaterial({ map, transparent: true, depthWrite: false, roughness: 0.55,
+        emissive: M.col('#ffffff'), emissiveMap: map, emissiveIntensity: ei, polygonOffset: true, polygonOffsetFactor: -2 - order });
+      const mesh = new T.Mesh(geo, m); mesh.position.set(0, 0.17, 0); mesh.scale.set(0.19 * k, 0.18 * k, 0.18 * k);
+      mesh.renderOrder = 3 + order; head.add(mesh); return mesh;
+    };
+    const base = layer(baseT, 1.006, 0.18, 0), eyes = layer(eyesT, 1.009, 0.3, 1), lids = layer(lidOpen, 1.012, 0.18, 2);
+    return { mesh: base,
+      blink(c) { const t = c ? lidShut : lidOpen; if (lids.material.map !== t) { lids.material.map = t; lids.material.emissiveMap = t; } eyes.visible = !c; },
+      // gx > 0：眼珠移向角色左侧（局部 +X）；gy > 0：向上
+      gaze(gx, gy) { eyesT.offset.set(1 + gx, -gy); } };
+  };
+
+  // ---- 边缘光：月光冷边 + 火光暖边 ----
+  L.rim = (mat, k = 1) => {
+    mat.onBeforeCompile = sh => {
+      Object.assign(sh.uniforms, L.rimU);
+      sh.fragmentShader = 'uniform vec3 uRimCold; uniform float uRimWarm, uSnow;\n' + sh.fragmentShader.replace('#include <normal_fragment_maps>',
+        `#include <normal_fragment_maps>
+        float upF = dot(normal, normalize((viewMatrix * vec4(0., 1., 0., 0.)).xyz));
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.86,.9,1.), uSnow * smoothstep(.5, .85, upF));`).replace('#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        float rimF = pow(1. - max(dot(normal, normalize(vViewPosition)), 0.), 3.);
+        totalEmissiveRadiance += mix(uRimCold * .22, vec3(1., .55, .2) * .55, uRimWarm) * rimF * ${k.toFixed(2)};`);
+    };
+    return mat;
+  };
+
+  // ---- 布料贴图 ----
+  L.knit = M.canvasTex('knit', 128, (g, s) => {
+    const r = M.rand(4); g.fillStyle = '#ffffff'; g.fillRect(0, 0, s, s);
+    for (let x = 0; x < s; x += 8) for (let y = 0; y < s; y += 8) {
+      g.strokeStyle = `rgba(80,20,10,${0.22 + r() * 0.12})`; g.lineWidth = 1.6;
+      g.beginPath(); g.moveTo(x + 1, y + 1); g.lineTo(x + 4, y + 7); g.lineTo(x + 7, y + 1); g.stroke();
+    }
+    for (let x = 0; x < s; x += 16) { g.fillStyle = 'rgba(60,10,5,0.12)'; g.fillRect(x, 0, 2, s); }
+  });
+  L.knit.repeat.set(5, 5);
+  L.plaid = M.canvasTex('plaid', 128, (g, s) => {
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, s, s);
+    const band = (x, w, c) => { g.fillStyle = c; g.fillRect(x, 0, w, s); g.fillRect(0, x, s, w); };
+    band(0, 18, 'rgba(20,30,50,0.32)'); band(40, 6, 'rgba(200,180,120,0.45)'); band(70, 22, 'rgba(20,30,50,0.32)'); band(104, 4, 'rgba(160,50,40,0.5)');
+    for (let i = 0; i < s; i += 2) { g.fillStyle = 'rgba(0,0,0,0.05)'; g.fillRect(0, i, s, 1); }
+  });
+  L.plaid.repeat.set(3, 3);
+
+  // ---- 奶奶：脸、白发、碎花裙 ----
+  L.patchGeo = new T.SphereGeometry(1, 32, 20, PI / 2 - 0.95, 1.9, PI * 0.3, PI * 0.42);
+  L.grannyFace = M.canvasTex('grannyFace', 512, (g, s) => {
+    g.clearRect(0, 0, s, s); g.lineCap = 'round';
+    for (const sd of [-1, 1]) {
+      const x = 256 + sd * 96;
+      const gr = g.createRadialGradient(x + sd * 50, 330, 0, x + sd * 50, 330, 50); gr.addColorStop(0, 'rgba(240,120,110,0.5)'); gr.addColorStop(1, 'rgba(240,120,110,0)');
+      g.fillStyle = gr; g.fillRect(x + sd * 50 - 50, 280, 100, 100);
+      g.strokeStyle = '#2e1c12'; g.lineWidth = 11; g.beginPath(); g.ellipse(x, 252, 30 * SX, 16, 0, PI * 1.1, PI * 1.9); g.stroke();
+      g.strokeStyle = 'rgba(120,70,50,0.6)'; g.lineWidth = 3.5;
+      for (let k = 0; k < 3; k++) { g.beginPath(); g.moveTo(x + sd * 30, 250 + (k - 1) * 9); g.lineTo(x + sd * 44, 246 + (k - 1) * 14); g.stroke(); }
+      g.strokeStyle = '#a8a29a'; g.lineWidth = 10; g.beginPath(); g.ellipse(x, 198, 32 * SX, 11, sd * 0.15, PI * 1.15, PI * 1.85); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,0.35)'; g.beginPath(); g.ellipse(x - sd * 8, 236, 8, 12, -0.4, 0, PI * 2); g.fill();
+      g.strokeStyle = 'rgba(140,80,60,0.5)'; g.lineWidth = 3; g.beginPath(); g.ellipse(256 + sd * 44, 372, 14, 40, sd * 0.25, sd > 0 ? -0.6 : PI - 0.6, sd > 0 ? 0.9 : PI + 0.9); g.stroke();
+    }
+    g.strokeStyle = 'rgba(140,80,60,0.35)'; g.lineWidth = 3;
+    for (let k = 0; k < 2; k++) { g.beginPath(); g.ellipse(256, 150 + k * 14, 60 * SX, 8, 0, PI * 1.15, PI * 1.85); g.stroke(); }
+    const n = g.createRadialGradient(256, 312, 0, 256, 312, 18); n.addColorStop(0, 'rgba(200,110,90,0.55)'); n.addColorStop(1, 'rgba(200,110,90,0)');
+    g.fillStyle = n; g.fillRect(230, 290, 52, 46);
+    g.strokeStyle = '#7a3026'; g.lineWidth = 9; g.beginPath(); g.ellipse(256, 392, 34 * SX, 18, 0, PI * 0.12, PI * 0.88); g.stroke();
+  }, { clamp: false });
+  L.grannyFace.wrapS = T.RepeatWrapping; L.grannyFace.repeat.x = -1; L.grannyFace.offset.x = 1;
+  L.hairTex = M.canvasTex('whiteHair', 128, (g, s) => {
+    const r = M.rand(12); g.fillStyle = '#ffffff'; g.fillRect(0, 0, s, s);
+    for (let i = 0; i < 160; i++) { g.strokeStyle = `rgba(120,115,110,${0.08 + r() * 0.18})`; g.lineWidth = 1;
+      const x = r() * s; g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + 6, s * 0.3, x - 6, s * 0.7, x + 3, s); g.stroke(); }
+  });
+  L.floral = M.canvasTex('floral', 128, (g, s) => {
+    const r = M.rand(19); g.fillStyle = '#ffffff'; g.fillRect(0, 0, s, s);
+    for (let i = 0; i < 26; i++) { const x = r() * s, y = r() * s;
+      g.fillStyle = 'rgba(255,220,190,0.55)'; for (let p = 0; p < 5; p++) { const a = p / 5 * PI * 2; g.beginPath(); g.arc(x + Math.cos(a) * 3, y + Math.sin(a) * 3, 2.4, 0, PI * 2); g.fill(); }
+      g.fillStyle = 'rgba(255,200,90,0.8)'; g.beginPath(); g.arc(x, y, 1.6, 0, PI * 2); g.fill(); }
+  });
+  L.floral.repeat.set(4, 4);
+})();
+// ===== 08-girl.js：小女孩模型 + 分层程序动画 =====
+(() => {
+  const PI = Math.PI;
+  const LK = M.girlLook;
+  const mat = (c, r = 0.85, o = {}) => LK.rim(M.mat.std(c, r, { ...o, unique: true }));
+  const skin = mat('#f4c3a2', 0.6), red = mat('#ffffff', 0.95, { side: T.DoubleSide, map: LK.knit }), hair = mat('#9a4a2a', 0.8);
+  red.color.copy(M.col('#c23a2e'));
+  const shawl = mat('#ffffff', 0.95, { side: T.DoubleSide, map: LK.plaid }), apron = mat('#b9a88e', 0.95, { side: T.DoubleSide });
+  shawl.color.copy(M.col('#56688a'));
+  const sock = mat('#3a2e2a', 0.9), foot = mat('#e7a99c', 0.6);
+  const dressTex = M.canvasTex('dress', 256, (g, s) => {
+    const r = M.rand(9); g.fillStyle = '#7b5640'; g.fillRect(0, 0, s, s);
+    for (let i = 0; i < 6; i++) { g.fillStyle = ['#6a4a38', '#8a6a4e', '#5a4a3e'][i % 3]; const x = r() * s, y = s * 0.3 + r() * s * 0.6; g.fillRect(x, y, 30 + r() * 30, 26 + r() * 26);
+      g.strokeStyle = 'rgba(30,20,10,.6)'; g.setLineDash([4, 4]); g.strokeRect(x, y, 30, 26); }
+    g.setLineDash([]); for (let y = 0; y < s; y += 3) { g.fillStyle = `rgba(0,0,0,${0.03 + r() * 0.04})`; g.fillRect(0, y, s, 1); }
+  });
+  const dress = mat('#ffffff', 0.95, { map: dressTex, side: T.DoubleSide });
+  const capsule = (r, len, seg = 10) => {
+    const pts = []; for (let i = 0; i <= 6; i++) { const a = -PI / 2 + i / 6 * PI / 2; pts.push(new T.Vector2(Math.cos(a) * r, Math.sin(a) * r - len / 2)); }
+    for (let i = 0; i <= 6; i++) { const a = i / 6 * PI / 2; pts.push(new T.Vector2(Math.cos(a) * r, Math.sin(a) * r + len / 2)); }
+    return new T.LatheGeometry(pts, seg);
+  };
+  const lathe = (pts, seg = 20, ps = 0, pl = PI * 2) => new T.LatheGeometry(pts.map(p => new T.Vector2(p[0], p[1])), seg, ps, pl);
+  const grp = (parent, x = 0, y = 0, z = 0) => { const g = new T.Group(); g.position.set(x, y, z); parent.add(g); return g; };
+  const mesh = (parent, geo, m, x = 0, y = 0, z = 0, sx = 1, sy = 1, sz = 1) => {
+    const o = new T.Mesh(geo, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.castShadow = true; parent.add(o); return o; };
+  const sph = new T.SphereGeometry(1, 20, 14);
+
+  const root = new T.Group(); M.scene.add(root);
+  const hips = grp(root, 0, 0.5, 0);
+  const skirt = grp(hips);
+  mesh(skirt, lathe([[0.11, 0.24], [0.14, 0.16], [0.19, 0.02], [0.245, -0.14], [0.27, -0.2], [0.262, -0.205]], 28), dress);
+  mesh(skirt, lathe([[0.15, 0.16], [0.2, 0.02], [0.252, -0.13], [0.258, -0.16]], 14, -0.85, 1.7), apron);
+  const leg = side => {
+    const th = grp(hips, side * 0.07, 0.02, 0);
+    mesh(th, capsule(0.045, 0.16), sock, 0, -0.1, 0);
+    const kn = grp(th, 0, -0.21, 0);
+    mesh(kn, capsule(0.04, 0.16), sock, 0, -0.1, 0);
+    const ft = grp(kn, 0, -0.24, 0);
+    mesh(ft, sph, foot, 0, 0.01, 0.035, 0.045, 0.035, 0.08);
+    return { th, kn, ft };
+  };
+  const L = leg(1), R = leg(-1);
+  const torso = grp(hips, 0, 0.18, 0);
+  const chest = grp(torso, 0, 0.06, 0);
+  mesh(chest, lathe([[0.1, -0.12], [0.125, -0.04], [0.12, 0.08], [0.07, 0.15], [0.04, 0.17]]), dress);
+  mesh(chest, lathe([[0.05, 0.17], [0.14, 0.12], [0.18, 0.02], [0.2, -0.07], [0.19, -0.08]], 22), shawl);
+  const neck = grp(chest, 0, 0.17, 0);
+  const head = grp(neck, 0, 0.02, 0);
+  mesh(head, new T.SphereGeometry(1, 28, 20), skin, 0, 0.17, 0, 0.19, 0.18, 0.18);
+  const face = LK.face(head), locks = [];
+  for (const s of [1, -1]) {
+    const lg = grp(head, s * 0.15, 0.15, 0.06); locks.push(lg);
+    mesh(lg, capsule(0.022, 0.1, 6), hair, 0, -0.05, 0).rotation.z = s * 0.25;
+  }
+  mesh(head, sph, mat('#f0b49c', 0.6), 0, 0.14, 0.18, 0.016, 0.013, 0.012);
+  // 刘海：贴合额头的发片，下缘做成 5 个尖角的波浪
+  { const ps = PI / 2 - 1.0, pl = 2.0, t0 = PI * 0.06, t1 = PI * 0.33;
+    const bang = new T.SphereGeometry(1, 40, 10, ps, pl, t0, t1 - t0), p = bang.attributes.position, v = new T.Vector3();
+    for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); const th = Math.acos(M.clamp(v.y, -1, 1));
+      const k = (th - t0) / (t1 - t0), phi = Math.atan2(v.z, -v.x), u = (phi - ps) / pl;
+      const tip = Math.pow(Math.abs(Math.sin(u * PI * 5)), 0.7), edge = Math.min(u, 1 - u) < 0.08 ? 0.4 : 1;
+      const th2 = t0 + (th - t0) * (1 + k * (tip * 0.32 * edge - 0.12));
+      v.set(-Math.cos(phi) * Math.sin(th2), Math.cos(th2), Math.sin(phi) * Math.sin(th2)); p.setXYZ(i, v.x, v.y, v.z); }
+    bang.computeVertexNormals();
+    mesh(head, bang, hair, 0, 0.17, 0, 0.197, 0.187, 0.189); }
+  mesh(head, new T.SphereGeometry(0.212, 26, 16, PI / 2 + 1.1, PI * 2 - 2.2, 0, PI * 0.78), red, 0, 0.17, -0.005).rotation.x = -0.2;
+  // 头巾开口的卷边
+  { const pts = [], R = 0.214;
+    const at = (phi, th) => new T.Vector3(-Math.cos(phi) * Math.sin(th) * R, Math.cos(th) * R, Math.sin(phi) * Math.sin(th) * R);
+    for (let i = 0; i <= 8; i++) pts.push(at(PI / 2 + 1.1, PI * (0.78 - i * 0.06)));
+    for (let i = 1; i < 8; i++) pts.push(at(PI / 2 + 1.1 - i * 2.2 / 8, PI * 0.3));
+    for (let i = 0; i <= 8; i++) pts.push(at(PI / 2 - 1.1, PI * (0.3 + i * 0.06)));
+    const brim = mesh(head, new T.TubeGeometry(new T.CatmullRomCurve3(pts), 48, 0.021, 8, false), red, 0, 0.17, -0.005);
+    brim.rotation.x = -0.2; }
+  mesh(head, new T.SphereGeometry(0.215, 26, 10, 0, PI * 2, 0, PI * 0.3), red, 0, 0.17, 0).rotation.x = 0.02;
+  mesh(head, new T.CylinderGeometry(0.13, 0.21, 0.22, 22, 1, true, 1.0, PI * 2 - 2.0), red, 0, -0.01, -0.02);
+  mesh(head, sph, red, 0.035, 0.0, 0.11, 0.035, 0.03, 0.03); mesh(head, sph, red, -0.035, 0.0, 0.11, 0.035, 0.03, 0.03);
+  mesh(head, capsule(0.02, 0.08, 6), red, 0.05, -0.05, 0.11).rotation.z = 0.3;
+  mesh(head, capsule(0.02, 0.07, 6), red, -0.04, -0.05, 0.12).rotation.z = -0.4;
+  // 头巾后面两条飘带，每条两节
+  const tails = [1, -1].map(s => {
+    const a = grp(head, s * 0.04, 0.06, -0.17), b = grp(a, 0, -0.1, 0);
+    mesh(a, M.unitBox, red, 0, -0.05, 0, 0.055, 0.11, 0.012); mesh(b, M.unitBox, red, 0, -0.05, 0, 0.05, 0.11, 0.012);
+    a.rotation.z = s * 0.18; return { a, b, s };
+  });
+  const arm = side => {
+    const sh = grp(chest, side * 0.135, 0.09, 0);
+    mesh(sh, capsule(0.042, 0.13), dress, 0, -0.09, 0);
+    const el = grp(sh, 0, -0.19, 0);
+    mesh(el, capsule(0.036, 0.12), dress, 0, -0.08, 0);
+    const hand = grp(el, 0, -0.18, 0);
+    mesh(hand, sph, skin, 0, -0.005, 0.004, 0.036, 0.05, 0.03);
+    mesh(hand, sph, skin, -side * 0.028, 0.008, 0.016, 0.013, 0.022, 0.013).rotation.z = -side * 0.5;
+    return { sh, el, hand };
+  };
+  const AL = arm(1), AR = arm(-1);
+  // 篮子挂在左前臂
+  const basket = grp(AL.el, 0.04, -0.1, 0.07);
+  const wick = mat('#a9783e', 0.9, { side: T.DoubleSide, key: 'wick' });
+  mesh(basket, lathe([[0.06, -0.06], [0.1, -0.03], [0.12, 0.05]], 14), wick, 0, -0.06, 0);
+  mesh(basket, new T.TorusGeometry(0.11, 0.008, 4, 16, PI), wick, 0, -0.01, 0).rotation.y = PI / 2;
+  const stickM = mat('#e2cc9c', 0.8), headM = mat('#a5281c', 0.6);
+  for (let i = 0; i < 7; i++) {
+    const s = mesh(basket, M.unitBox, stickM, -0.04 + i * 0.013, -0.02, (i % 3 - 1) * 0.02, 0.008, 0.11, 0.008); s.rotation.z = 0.2;
+    mesh(basket, sph, headM, -0.04 + i * 0.013 - 0.01, 0.035, (i % 3 - 1) * 0.02, 0.009, 0.012, 0.009);
+  }
+  // 右手中的火柴
+  const matchG = grp(AR.hand, 0, -0.02, 0.03); matchG.rotation.x = -1.2;
+  mesh(matchG, M.unitBox, stickM, 0, 0.05, 0, 0.008, 0.11, 0.008);
+  const tip = grp(matchG, 0, 0.11, 0);
+  mesh(tip, sph, headM, 0, 0, 0, 0.01, 0.013, 0.01);
+  matchG.visible = false;
+  root.traverse(o => { if (o.isMesh) o.receiveShadow = true; });
+
+  // ---- 姿势 ----
+  const P = () => ({ thL: 0, knL: 0, thR: 0, knR: 0, shLx: 0, shLz: 0.12, elL: -0.25, shRx: 0, shRz: -0.12, elR: -0.15, torX: 0.05, headX: 0, hipsY: 0.5, roll: 0 });
+  const mix = (a, b, t) => { const o = {}; for (const k in a) o[k] = a[k] + (b[k] - a[k]) * t; return o; };
+  const armPose = o => Object.assign(P(), o);
+  const POSES = {
+    reach: armPose({ shRx: -0.4, shRz: 0.55, elR: -0.7, shLx: -0.3, elL: -0.9 }),
+    chest: armPose({ shLx: -0.75, shLz: -0.35, elL: -1.5, shRx: -0.75, shRz: 0.35, elR: -1.5, torX: 0.12 }),
+    swipe: armPose({ shLx: -0.75, shLz: -0.35, elL: -1.5, shRx: -0.6, shRz: -0.35, elR: -1.3, torX: 0.12 }),
+    hold: armPose({ shLx: -0.5, shLz: -0.15, elL: -1.2, shRx: -1.05, shRz: 0.12, elR: -1.25, torX: 0.08, headX: 0.12 }),
+    warm: armPose({ shLx: -1.0, shLz: -0.1, elL: -0.5, shRx: -1.0, shRz: 0.1, elR: -0.5, torX: 0.18, headX: 0.05 }),
+    hug: armPose({ shLx: -1.0, shLz: 0.45, elL: -1.0, shRx: -1.0, shRz: -0.45, elR: -1.0, torX: 0.04, headX: -0.3 }),
+    rub: armPose({ shLx: -0.8, shLz: -0.4, elL: -1.6, shRx: -0.8, shRz: 0.4, elR: -1.6, torX: 0.1, headX: 0.15 }),
+  };
+  const G = M.girl = { group: root, pos: root.position, heading: PI, speed: 0, hand: tip, matchG, hold: null, cold: 0.3 };
+  let phase = 0, wWalk = 0, act = null, wAct = 0, cur = P(), rubT = 6, lookTarget = null, headYaw = 0, lastSin = 0, blinkT = 3, rimW = 0;
+  let gazeX = 0, gazeY = 0, sacT = 1; const sac = new T.Vector2(), _gv = new T.Vector3();
+  G.play = (name, onDone, onHit) => { act = { name, t: 0, onDone, onHit, hit: false }; };
+  G.setHold = name => { G.hold = name; };
+  G.look = v => { lookTarget = v; };
+  const strikePose = t => {
+    if (t < 0.4) return mix(P(), POSES.reach, M.smooth(0, 0.4, t));
+    if (t < 0.7) return mix(POSES.reach, POSES.chest, M.smooth(0.4, 0.7, t));
+    if (t < 0.9) return mix(POSES.chest, POSES.swipe, M.smooth(0.7, 0.85, t));
+    return mix(POSES.swipe, POSES.hold, M.smooth(0.9, 1.5, t));
+  };
+  G.update = dt => {
+    wWalk = M.damp(wWalk, G.speed > 0.05 ? 1 : 0, 8, dt);
+    phase += dt * 2 * PI * 2.1 * Math.min(1, G.speed / 1.6 + 0.2) * (G.speed > 0.05 ? 1 : 0);
+    const s = Math.sin(phase), c = Math.cos(phase);
+    const walk = Object.assign(P(), { thL: -s * 0.5, thR: s * 0.5, knL: 0.1 + 0.8 * Math.max(0, c), knR: 0.1 + 0.8 * Math.max(0, -c),
+      shLx: s * 0.18, shRx: -s * 0.38, elR: -0.3, hipsY: 0.5 + 0.022 * Math.cos(2 * phase), roll: s * 0.05, torX: 0.1 });
+    let pose = mix(P(), walk, wWalk);
+    // 一次性动作 / 持续姿势
+    let target = null;
+    if (act) {
+      act.t += dt;
+      if (act.name === 'strike') { target = strikePose(act.t); if (!act.hit && act.t > 0.8) { act.hit = true; act.onHit && act.onHit(); } if (act.t > 1.6) { const a = act; act = null; G.hold = G.hold || 'hold'; a.onDone && a.onDone(); } }
+    } else if (G.hold) target = POSES[G.hold];
+    else if (wWalk < 0.1 && G.warmNear > 0.5) target = POSES.warm;
+    else if (wWalk < 0.1) { rubT -= dt; if (rubT < 0) { target = POSES.rub; if (rubT < -2.5) rubT = G.cold > 0.6 ? 3 + Math.random() * 2 : 8 + Math.random() * 6; } }
+    wAct = M.damp(wAct, target ? 1 : 0, act ? 14 : 5, dt);
+    if (target) G._lastAct = target;
+    if (G._lastAct) for (const k of ['shLx', 'shLz', 'elL', 'shRx', 'shRz', 'elR', 'torX', 'headX']) pose[k] = M.lerp(pose[k], G._lastAct[k], wAct);
+    if (G.hold === 'rub' || (target === POSES.rub)) { pose.elL += Math.sin(M.time * 14) * 0.15; pose.elR -= Math.sin(M.time * 14) * 0.15; }
+    cur = mix(cur, pose, 1 - Math.exp(-18 * dt));
+    // 应用
+    L.th.rotation.x = cur.thL; L.kn.rotation.x = cur.knL; R.th.rotation.x = cur.thR; R.kn.rotation.x = cur.knR;
+    L.ft.rotation.x = -cur.thL - cur.knL; R.ft.rotation.x = -cur.thR - cur.knR;
+    AL.sh.rotation.set(cur.shLx, 0, cur.shLz); AL.el.rotation.x = cur.elL;
+    AR.sh.rotation.set(cur.shRx, 0, cur.shRz); AR.el.rotation.x = cur.elR;
+    const shiver = G.cold > 0.5 ? Math.sin(M.time * 38) * 0.022 * (G.cold - 0.45) * (1 - wWalk * 0.6) : 0;
+    hips.position.y = cur.hipsY; hips.rotation.z = cur.roll + shiver; torso.rotation.x = cur.torX;
+    chest.scale.setScalar(1 + Math.sin(M.time * 2.1) * 0.012);
+    let yawT = 0;
+    if (lookTarget) { const a = Math.atan2(lookTarget.x - root.position.x, lookTarget.z - root.position.z) - G.heading;
+      yawT = M.clamp(Math.atan2(Math.sin(a), Math.cos(a)), -1, 1);
+      const dy = lookTarget.y - 1.1, dd = Math.hypot(lookTarget.x - root.position.x, lookTarget.z - root.position.z);
+      cur.headX = M.lerp(cur.headX, -Math.atan2(dy, dd) * 0.6, 0.1); }
+    headYaw = M.damp(headYaw, yawT, 6, dt);
+    neck.rotation.set(cur.headX, headYaw, -cur.roll * 0.6);
+    // 视线：看目标 / 近景看镜头 / 朝前，外加微小扫视
+    sacT -= dt; if (sacT < 0) { sacT = 0.8 + Math.random() * 1.7; sac.set((Math.random() - 0.5) * 0.008, (Math.random() - 0.5) * 0.006); }
+    let gx = 0, gy = 0, src = lookTarget;
+    if (!src && M.camera.position.distanceTo(root.position) < 4.5) src = M.camera.position;
+    if (src) { _gv.copy(src); head.worldToLocal(_gv); _gv.y -= 0.17;
+      const yaw = Math.atan2(_gv.x, _gv.z), pit = Math.atan2(_gv.y, Math.hypot(_gv.x, _gv.z));
+      if (Math.abs(yaw) < 1.7) { gx = M.clamp(yaw / 0.9, -1, 1) * 0.02; gy = M.clamp(pit / 0.7, -1, 1) * 0.014; } }
+    gazeX = M.damp(gazeX, gx + sac.x, 12, dt); gazeY = M.damp(gazeY, gy + sac.y, 12, dt); face.gaze(gazeX, gazeY);
+    root.rotation.y = G.heading;
+    // 二级动作：裙摆、飘带、发缕
+    const sp = G.speed, sw = Math.sin(M.time * 2.3);
+    skirt.rotation.set(sp * 0.05 + Math.sin(2 * phase) * 0.03 * wWalk, 0, -cur.roll * 0.8);
+    for (const t of tails) {
+      t.a.rotation.set(0.15 + sp * 0.35 + sw * 0.07 + Math.sin(phase * 2) * 0.05 * wWalk, 0, t.s * (0.18 + Math.sin(M.time * 1.7 + t.s) * 0.05));
+      t.b.rotation.x = 0.1 + sp * 0.2 + Math.sin(M.time * 2.3 - 0.8) * 0.1;
+    }
+    locks.forEach((l, i) => { l.rotation.z = Math.sin(M.time * 1.9 + i) * 0.08 + cur.roll * 0.5; });
+    // 眨眼、火光边缘光、火柴可见
+    blinkT -= dt; face.blink(blinkT < 0.12); if (blinkT < 0) blinkT = (lookTarget ? 4.5 : 2.5) + Math.random() * 3;
+    rimW = M.damp(rimW, M.story && M.story.flame ? 1 : 0, 3, dt); LK.rimU.uRimWarm.value = rimW;
+    const sn = LK.rimU.uSnow;
+    sn.value = M.clamp(sn.value + ((G.warmNear || 0) > 0.3 || (M.story && M.story.dawn > 0) ? -0.15 : G.cold > 0.45 ? 0.012 : 0) * dt, 0, 0.65);
+    matchG.visible = !!(act && act.name === 'strike' && act.t > 0.35) || !!(M.story && M.story.flame);
+    // 脚步
+    if (wWalk > 0.5 && Math.sign(s) !== Math.sign(lastSin)) {
+      const ft = (s > 0 ? R : L).ft, p = new T.Vector3(); ft.getWorldPosition(p);
+      M.footprint && M.footprint(p.x, p.z, G.heading); M.audio && M.audio.step && M.audio.step(s > 0 ? 1 : -1);
+    }
+    lastSin = s;
+  };
+  root.position.set(1, 0, 11.5); root.rotation.y = PI;
+})();
+// ===== 09-npcs.js：白鹅、奶奶 =====
+(() => {
+  const PI = Math.PI, sph = new T.SphereGeometry(1, 18, 12);
+  const capsule = (r, len, seg = 12) => {
+    const pts = []; for (let i = 0; i <= 6; i++) { const a = -PI / 2 + i / 6 * PI / 2; pts.push(new T.Vector2(Math.cos(a) * r, Math.sin(a) * r - len / 2)); }
+    for (let i = 0; i <= 6; i++) { const a = i / 6 * PI / 2; pts.push(new T.Vector2(Math.cos(a) * r, Math.sin(a) * r + len / 2)); }
+    return new T.LatheGeometry(pts, seg);
+  };
+  const mesh = (p, geo, m, x = 0, y = 0, z = 0, sx = 1, sy = 1, sz = 1) => {
+    const o = new T.Mesh(geo, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.castShadow = true; p.add(o); return o; };
+  const grp = (p, x = 0, y = 0, z = 0) => { const g = new T.Group(); g.position.set(x, y, z); p.add(g); return g; };
+  const glowSprite = (color, size, opacity = 0.6) => {
+    const s = new T.Sprite(new T.SpriteMaterial({ map: M.tex.soft(), color: M.col(color), transparent: true, opacity,
+      blending: T.AdditiveBlending, depthWrite: false })); s.scale.setScalar(size); return s; };
+
+  // ---------------- 白鹅 ----------------
+  const white = M.mat.std('#f3efe6', 0.8), grey = M.mat.std('#cdc8be', 0.85), orange = M.mat.std('#f08a24', 0.5), black = M.mat.std('#111', 0.3);
+  const webM = M.mat.std('#e87e1e', 0.6, { side: T.DoubleSide, key: 'web' }), shine = new T.MeshBasicMaterial({ color: 0xffffff });
+  const goose = new T.Group(); goose.visible = false; M.scene.add(goose);
+  const gBody = grp(goose, 0, 0.3, 0);
+  // 泪滴形身体：胸在 +Z，尾部上翘收尖
+  const bodyGeo = new T.LatheGeometry([[0.001, -0.38], [0.05, -0.32], [0.12, -0.2], [0.175, -0.05], [0.195, 0.08], [0.18, 0.18], [0.12, 0.26], [0.001, 0.3]]
+    .map(p => new T.Vector2(p[0], p[1])), 24);
+  bodyGeo.rotateX(PI / 2);
+  { const p = bodyGeo.attributes.position; for (let i = 0; i < p.count; i++) { const z = p.getZ(i);
+      if (z < -0.12) p.setY(i, p.getY(i) + (-z - 0.12) * 0.75); } bodyGeo.computeVertexNormals(); }
+  mesh(gBody, bodyGeo, white, 0, 0, 0, 0.95, 0.85, 1);
+  for (const s of [-1, 0, 1]) mesh(gBody, sph, s ? white : grey, s * 0.035, 0.2, -0.38, 0.03, 0.018, 0.07).rotation.set(-0.7, s * 0.35, 0);
+  const wings = [1, -1].map(s => { const w = grp(gBody, s * 0.16, 0.04, -0.02);
+    mesh(w, sph, white, s * 0.02, 0, -0.04, 0.05, 0.11, 0.24).rotation.x = -0.12;
+    for (let i = 0; i < 3; i++) mesh(w, sph, i === 2 ? grey : white, s * (0.025 - i * 0.004), 0.05 - i * 0.022, -0.2 - i * 0.035, 0.03, 0.045, 0.15).rotation.x = -0.35;
+    return w; });
+  const neck = []; let parent = grp(gBody, 0, 0.08, 0.2);
+  for (let i = 0; i < 3; i++) { const n = grp(parent, 0, i ? 0.09 : 0, i ? 0.01 : 0);
+    mesh(n, capsule(0.05 - i * 0.004, 0.12), white, 0, 0.05, 0); neck.push(n); parent = n; }
+  const gHead = grp(parent, 0, 0.11, 0.02);
+  mesh(gHead, sph, white, 0, 0, 0, 0.058, 0.056, 0.076);
+  mesh(gHead, sph, white, 0, 0.018, 0.015, 0.05, 0.048, 0.05);
+  mesh(gHead, new T.ConeGeometry(0.028, 0.1, 10), orange, 0, -0.004, 0.115).rotation.x = PI / 2;
+  mesh(gHead, new T.ConeGeometry(0.022, 0.08, 10), orange, 0, -0.02, 0.1, 1, 1, 0.55).rotation.x = PI / 2 - 0.15;
+  mesh(gHead, sph, orange, 0, 0.014, 0.068, 0.022, 0.022, 0.018);
+  for (const s of [1, -1]) { mesh(gHead, sph, black, s * 0.05, 0.016, 0.03, 0.012, 0.014, 0.012);
+    mesh(gHead, sph, shine, s * 0.058, 0.021, 0.035, 0.004, 0.004, 0.004).castShadow = false; }
+  const web = new T.ShapeGeometry(new T.Shape([new T.Vector2(-0.045, 0), new T.Vector2(0.045, 0), new T.Vector2(0.03, 0.1), new T.Vector2(0, 0.085), new T.Vector2(-0.03, 0.1)]));
+  web.rotateX(PI / 2);
+  const gLegs = [1, -1].map(s => { const l = grp(goose, s * 0.08, 0.2, 0.02);
+    mesh(l, new T.CylinderGeometry(0.014, 0.016, 0.2, 8), orange, 0, -0.1, 0); mesh(l, web, webM, 0, -0.195, -0.02); return l; });
+  const gGlow = glowSprite('#ffc070', 0.9, 0.35); gGlow.position.set(0, 0.55, 0); goose.add(gGlow);
+  let gState = 'hidden', gT = 0, gPhase = 0, gHeading = 0, gSit = 0;
+  M.goose = { group: goose, get state() { return gState; } };
+  M.goose.appear = (from) => { goose.position.copy(from); goose.visible = true; gState = 'appear'; gT = 0; goose.scale.setScalar(0.01); M.audio && M.audio.honk(); };
+  M.goose.sit = () => { gState = 'sit'; };
+  M.onFrame(dt => {
+    if (gState === 'hidden') return;
+    gT += dt;
+    goose.scale.setScalar(M.damp(goose.scale.x, 1, 6, dt));
+    const g = M.girl, back = new T.Vector3(g.pos.x - Math.sin(g.heading) * 1.1 + Math.cos(g.heading) * 0.55, 0, g.pos.z - Math.cos(g.heading) * 1.1 - Math.sin(g.heading) * 0.55);
+    if (gState === 'sit') back.set(g.pos.x + Math.cos(g.heading) * 0.7, 0, g.pos.z - Math.sin(g.heading) * 0.7 + 0.2);
+    const dx = back.x - goose.position.x, dz = back.z - goose.position.z, d = Math.hypot(dx, dz);
+    const flap = gState === 'appear' && gT < 1.4 ? Math.max(0, Math.sin(gT * 18)) * 1.1 : 0;
+    wings.forEach((w, i) => w.rotation.z = (i ? -1 : 1) * flap);
+    let speed = 0;
+    if (d > (gState === 'sit' ? 0.1 : 0.9) && !(gState === 'appear' && gT < 1.2)) speed = M.clamp(d * 1.3, 0.5, 2.2);
+    if (gState === 'appear' && gT > 1.2) gState = 'follow';
+    if (speed > 0) { const tgt = Math.atan2(dx, dz); let da = tgt - gHeading; da = Math.atan2(Math.sin(da), Math.cos(da)); gHeading += da * Math.min(1, dt * 7);
+      goose.position.x += Math.sin(gHeading) * speed * dt; goose.position.z += Math.cos(gHeading) * speed * dt; gPhase += dt * speed * 9; }
+    else if (gState === 'sit') { let da = g.heading - gHeading; gHeading += Math.atan2(Math.sin(da), Math.cos(da)) * dt * 3; }
+    goose.rotation.y = gHeading;
+    const walking = speed > 0;
+    gBody.rotation.z = walking ? Math.sin(gPhase) * 0.14 : 0;
+    gLegs[0].rotation.x = walking ? Math.sin(gPhase) * 0.5 : 0; gLegs[1].rotation.x = walking ? -Math.sin(gPhase) * 0.5 : 0;
+    gSit = M.damp(gSit, gState === 'sit' && !walking ? 1 : 0, 3, dt);
+    gBody.position.y = 0.3 - gSit * 0.14; gLegs.forEach(l => l.visible = gSit < 0.6);
+    const peck = !walking && gState !== 'sit' ? Math.max(0, Math.sin(M.time * 0.9) - 0.75) * 4 : 0;
+    neck[0].rotation.x = 0.1 + peck * 0.9; neck[1].rotation.x = -0.15 + peck * 0.3; gHead.rotation.y = Math.sin(M.time * 0.7) * 0.4;
+  }, 40);
+
+  // ---------------- 奶奶 ----------------
+  const reveal = { value: -1 };
+  const gMat = (c, r = 0.85, side = T.FrontSide, o = {}) => {
+    const m = new T.MeshStandardMaterial({ color: M.col(c), roughness: r, side, emissive: M.col('#ffd9a0'), emissiveIntensity: 0.04,
+      map: o.map || null, transparent: !!o.transparent, depthWrite: !o.transparent, polygonOffset: !!o.transparent, polygonOffsetFactor: -2 });
+    m.onBeforeCompile = sh => {
+      sh.uniforms.uReveal = reveal;
+      sh.vertexShader = 'varying vec3 vWP;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n vWP = (modelMatrix*vec4(transformed,1.)).xyz;');
+      sh.fragmentShader = 'uniform float uReveal; varying vec3 vWP;\n' + sh.fragmentShader
+        .replace('void main() {', 'void main() {\n if (vWP.y > uReveal) discard;')
+        .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+          totalEmissiveRadiance += vec3(4.,2.6,1.2) * smoothstep(.12, 0., uReveal - vWP.y);
+          totalEmissiveRadiance += vec3(1.,.72,.38) * pow(1. - max(dot(normal, normalize(vViewPosition)), 0.), 3.) * .18;`);
+    };
+    return m;
+  };
+  const LK = M.girlLook;
+  const gskin = gMat('#f6cdb2', 0.6), gdress = gMat('#7a2533', 0.9, T.DoubleSide, { map: LK.floral }),
+    gshawl = gMat('#dccaa4', 0.95, T.DoubleSide, { map: LK.knit }), ghair = gMat('#f2f0ec', 0.8, T.FrontSide, { map: LK.hairTex }),
+    gapron = gMat('#efe6d6', 0.9, T.DoubleSide), ggold = gMat('#c9a24a', 0.3);
+  const gr = new T.Group(); gr.visible = false; M.scene.add(gr);
+  const lathe = (pts, seg = 22, ps = 0, pl = PI * 2) => new T.LatheGeometry(pts.map(p => new T.Vector2(p[0], p[1])), seg, ps, pl);
+  mesh(gr, lathe([[0.33, 0.0], [0.345, 0.03], [0.31, 0.2], [0.25, 0.45], [0.19, 0.64], [0.16, 0.73], [0.175, 0.82], [0.19, 0.92],
+    [0.175, 1.04], [0.15, 1.12], [0.1, 1.2], [0.06, 1.24]], 32), gdress);
+  mesh(gr, lathe([[0.3, 0.1], [0.33, 0.12], [0.3, 0.3], [0.24, 0.52], [0.19, 0.68], [0.172, 0.74]], 18, -0.95, 1.9), gapron);
+  mesh(gr, new T.TorusGeometry(0.168, 0.012, 6, 32), gapron, 0, 0.735, 0).rotation.x = PI / 2;
+  mesh(gr, lathe([[0.07, 1.24], [0.19, 1.17], [0.24, 1.05], [0.25, 0.93], [0.235, 0.86], [0.225, 0.85]], 28), gshawl);
+  { const tri = new T.Shape([new T.Vector2(-0.09, 0), new T.Vector2(0.09, 0), new T.Vector2(0, -0.13)]);
+    mesh(gr, new T.ShapeGeometry(tri), gshawl, 0, 0.88, 0.205).rotation.x = -0.12; }
+  mesh(gr, sph, ggold, 0, 1.12, 0.165, 0.018, 0.018, 0.012);
+  gskin.emissiveIntensity = 0.12;
+  const gHeadG = grp(gr, 0, 1.24, 0);
+  mesh(gHeadG, new T.SphereGeometry(1, 28, 20), gskin, 0, 0.14, 0, 0.13, 0.14, 0.13);
+  mesh(gHeadG, LK.patchGeo, gMat('#ffffff', 0.6, T.FrontSide, { map: LK.grannyFace, transparent: true }), 0, 0.14, 0, 0.1308, 0.1408, 0.1308).castShadow = false;
+  mesh(gHeadG, sph, gskin, 0, 0.125, 0.128, 0.018, 0.016, 0.014);
+  mesh(gHeadG, new T.SphereGeometry(1, 24, 14, 0, PI * 2, 0, PI * 0.55), ghair, 0, 0.15, -0.012, 0.142, 0.15, 0.142).rotation.x = -0.45;
+  for (const s of [1, -1]) mesh(gHeadG, sph, ghair, s * 0.115, 0.13, -0.01, 0.035, 0.06, 0.05);
+  mesh(gHeadG, sph, ghair, 0, 0.275, -0.075, 0.085, 0.072, 0.085);
+  mesh(gHeadG, new T.TorusGeometry(0.066, 0.013, 8, 20), gMat('#7a2533', 0.7), 0, 0.275, -0.075).rotation.x = PI / 2 - 0.5;
+  for (const s of [1, -1]) {
+    mesh(gHeadG, new T.TorusGeometry(0.03, 0.004, 6, 18), gMat('#c9a24a', 0.3), s * 0.045, 0.145, 0.13);
+    mesh(gHeadG, M.unitBox, gMat('#c9a24a', 0.3), s * 0.095, 0.15, 0.08, 0.004, 0.004, 0.09);
+  }
+  mesh(gHeadG, M.unitBox, gMat('#c9a24a', 0.3), 0, 0.148, 0.135, 0.03, 0.004, 0.004);
+  const gArms = [1, -1].map(s => {
+    const sh = grp(gr, s * 0.185, 1.12, 0);
+    mesh(sh, sph, gdress, 0, -0.08, 0, 0.065, 0.11, 0.065);
+    mesh(sh, new T.CylinderGeometry(0.048, 0.042, 0.3, 10), gdress, 0, -0.15, 0);
+    const el = grp(sh, 0, -0.3, 0); mesh(el, new T.CylinderGeometry(0.04, 0.034, 0.26, 10), gdress, 0, -0.13, 0);
+    mesh(el, new T.CylinderGeometry(0.042, 0.042, 0.035, 10), gapron, 0, -0.26, 0);
+    mesh(el, sph, gskin, 0, -0.31, 0.006, 0.036, 0.05, 0.026); return { sh, el, s };
+  });
+  const halo = glowSprite('#ffd59a', 3.2, 0.0); halo.position.y = 0.9; gr.add(halo);
+  gr.position.set(4, 0, -62.3);
+  let gPose = 'stand', gw = 0;
+  M.granny = { group: gr, reveal, halo };
+  M.granny.show = (dur = 2.5) => { gr.visible = true; reveal.value = -0.2; M.granny._dur = dur; M.granny._t = 0; };
+  M.granny.pose = p => { gPose = p; };
+  M.onFrame(dt => {
+    if (!gr.visible) return;
+    if (M.granny._t !== undefined && M.granny._t < M.granny._dur) { M.granny._t += dt; reveal.value = -0.2 + (M.granny._t / M.granny._dur) * 1.9; }
+    else reveal.value = 9;
+    halo.material.opacity = M.damp(halo.material.opacity, 0.32, 2, dt);
+    gw = M.damp(gw, gPose === 'stand' ? 0 : 1, 3, dt);
+    for (const a of gArms) {
+      const tx = gPose === 'hug' ? -1.25 : -0.9, tz = gPose === 'hug' ? -a.s * 0.45 : -a.s * 0.1;
+      a.sh.rotation.x = M.lerp(0.05, tx, gw); a.sh.rotation.z = M.lerp(a.s * 0.12, tz, gw); a.el.rotation.x = M.lerp(-0.2, gPose === 'hug' ? -0.9 : -0.4, gw);
+    }
+    gHeadG.rotation.x = 0.15 + Math.sin(M.time * 0.8) * 0.03;
+    gr.position.y = Math.sin(M.time * 1.2) * 0.015;
+  }, 41);
+})();
+// ===== 10-control.js：点击行走、避障、跟随相机、剧情镜头 =====
+(() => {
+  const G = M.girl, PI = Math.PI;
+  let target = null, stuck = 0;
+  const ray = new T.Raycaster(), plane = new T.Plane(new T.Vector3(0, 1, 0), 0), hit = new T.Vector3(), ndc = new T.Vector2();
+  M.control = { enabled: false };
+  M.control.walkTo = (x, z) => { target = new T.Vector3(x, 0, z); stuck = 0; };
+  M.control.stop = () => { target = null; };
+  let script = null;
+  M.control.goto = (x, z) => new Promise(res => {
+    if (Math.hypot(x - G.pos.x, z - G.pos.z) < 0.1) return res();
+    script = { x, z, res, t: 0, stuck: 0 };
+  });
+  const endScript = () => { const s = script; script = null; s && s.res(); };
+  M.input.onTap((cx, cy) => {
+    if (!M.control.enabled || (M.story && M.story.locked)) return;
+    ndc.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1);
+    ray.setFromCamera(ndc, M.camera);
+    if (!ray.ray.intersectPlane(plane, hit)) return;
+    let x = hit.x, z = hit.z;
+    if (!M.walkable(x, z)) {
+      const sx = G.pos.x, sz = G.pos.z; let ok = false;
+      for (let i = 1; i <= 40; i++) { const t = 1 - i / 40; const px = sx + (x - sx) * t, pz = sz + (z - sz) * t;
+        if (M.walkable(px, pz)) { x = px; z = pz; ok = true; break; } }
+      if (!ok) return;
+    }
+    M.control.walkTo(x, z);
+    M.fx && M.fx.tapRing && M.fx.tapRing(x, z);
+  });
+  const keys = {};
+  addEventListener('keydown', e => { keys[e.code] = true; });
+  addEventListener('keyup', e => { keys[e.code] = false; });
+
+  const tryMove = (nx, nz) => {
+    const p = { x: nx, z: nz }; M.collide(p, 0.22);
+    if (M.walkable(p.x, p.z)) { G.pos.x = p.x; G.pos.z = p.z; return true; }
+    return false;
+  };
+  M.onFrame(dt => {
+    let want = 0, dirX = 0, dirZ = 0;
+    const locked = !M.control.enabled || (M.story && M.story.locked);
+    const kx = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
+    const kz = (keys.KeyS || keys.ArrowDown ? 1 : 0) - (keys.KeyW || keys.ArrowUp ? 1 : 0);
+    if (script) {
+      script.t += dt;
+      const dx = script.x - G.pos.x, dz = script.z - G.pos.z, d = Math.hypot(dx, dz);
+      if (d < 0.1 || script.t > 4 || script.stuck > 0.45) endScript();
+      else { dirX = dx / d; dirZ = dz / d; want = Math.min(1.3, d * 2.2 + 0.35); }
+    } else if (!locked && (kx || kz)) {
+      target = null; const y = cam.yaw;
+      dirX = kx * Math.cos(y) + kz * Math.sin(y); dirZ = -kx * Math.sin(y) + kz * Math.cos(y);
+      const l = Math.hypot(dirX, dirZ); dirX /= l; dirZ /= l; want = 1.7;
+    } else if (target && !locked) {
+      const dx = target.x - G.pos.x, dz = target.z - G.pos.z, d = Math.hypot(dx, dz);
+      if (d < 0.12) target = null; else { dirX = dx / d; dirZ = dz / d; want = Math.min(1.7, d * 2.5 + 0.4); }
+    } else if (locked) target = null;
+    if (want > 0) {
+      want *= 1 - 0.35 * M.smooth(0.6, 1, G.cold);
+      if (G.hold && !locked) G.setHold(null);
+      const tgt = Math.atan2(dirX, dirZ); let da = tgt - G.heading; da = Math.atan2(Math.sin(da), Math.cos(da));
+      G.heading += da * Math.min(1, dt * 9);
+      const facing = Math.cos(da) > 0.3 ? 1 : 0.25;
+      G.speed = M.damp(G.speed, want * facing, 6, dt);
+      const sx = G.pos.x, sz = G.pos.z, step = G.speed * dt, mx = Math.sin(G.heading) * step, mz = Math.cos(G.heading) * step;
+      if (!tryMove(sx + mx, sz + mz) && !tryMove(sx + mx, sz) && !tryMove(sx, sz + mz)) stuck += dt;
+      if (Math.hypot(G.pos.x - sx, G.pos.z - sz) < step * 0.2) stuck += dt; else stuck = 0;
+      if (script) script.stuck = stuck;
+      if (stuck > 0.5) { target = null; stuck = 0; }
+    } else G.speed = M.damp(G.speed, 0, 10, dt);
+    G.update(dt);
+  }, 30);
+
+  // ---- 跟随相机 ----
+  const cam = M.cam = { yaw: 0, pitch: 0.62, dist: 9, tYaw: 0, tPitch: 0.62, tDist: 9, target: new T.Vector3(1, 0.9, 14), override: null, user: true };
+  M.input.onDrag((dx, dy) => { if (!cam.user) return; cam.tYaw -= dx * 0.005; cam.tPitch = M.clamp(cam.tPitch + dy * 0.004, 0.22, 1.25); });
+  M.input.onZoom(d => { if (!cam.user) return; cam.tDist = M.clamp(cam.tDist * (1 + d * 0.12), 4.5, 17); });
+  cam.focus = o => { cam.override = { target: o.target.clone(), dist: o.dist ?? cam.tDist, yaw: o.yaw ?? cam.tYaw, pitch: o.pitch ?? cam.tPitch, rate: o.rate ?? 1.6 }; };
+  // 用"机位点 → 看向点"描述镜头，换算成环绕参数
+  cam.shot = (from, to, rate) => {
+    const d = from.clone().sub(to), dist = d.length();
+    cam.focus({ target: to, dist, yaw: Math.atan2(d.x, d.z), pitch: Math.asin(d.y / dist), rate });
+  };
+  cam.release = () => { if (cam.override) { cam.tYaw = cam.yaw; cam.tPitch = M.clamp(cam.pitch, 0.22, 1.25); cam.tDist = M.clamp(cam.dist, 4.5, 17); } cam.override = null; };
+  cam.snap = () => { cam.yaw = cam.tYaw; cam.pitch = cam.tPitch; cam.dist = cam.tDist; cam.target.set(G.pos.x, 0.9, G.pos.z); };
+  const tgt = new T.Vector3();
+  M.onFrame(dt => {
+    const o = cam.override, rate = o ? o.rate : 4;
+    if (o) tgt.copy(o.target); else tgt.set(G.pos.x, 0.9, G.pos.z);
+    cam.target.x = M.damp(cam.target.x, tgt.x, rate * 1.4, dt); cam.target.y = M.damp(cam.target.y, tgt.y, rate * 1.4, dt); cam.target.z = M.damp(cam.target.z, tgt.z, rate * 1.4, dt);
+    let ty = o ? o.yaw : cam.tYaw; let dy = ty - cam.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+    cam.yaw += dy * (1 - Math.exp(-rate * 1.5 * dt));
+    cam.pitch = M.damp(cam.pitch, o ? o.pitch : cam.tPitch, rate * 1.5, dt);
+    cam.dist = M.damp(cam.dist, o ? o.dist : cam.tDist, rate * 1.2, dt);
+    const c = Math.cos(cam.pitch), p = M.camera.position;
+    // 竖屏时水平视野窄：沿镜头方向拉远，保证主体与目标都在画内
+    const asp = M.camera.aspect, K = asp < 1 ? 1 + (1 - asp) * 1.25 : 1, dd = cam.dist * K;
+    p.set(cam.target.x + Math.sin(cam.yaw) * c * dd, cam.target.y + Math.sin(cam.pitch) * dd, cam.target.z + Math.cos(cam.yaw) * c * dd);
+    if (p.z > -44 && p.x < -3.6) p.x = -3.6;
+    if (p.z > -44 && p.x > 16.2) p.x = 16.2;
+    if (p.z < -64.4) p.z = -64.4;
+    if (p.x < 6 && p.z > 19.2) p.z = 19.2;
+    if (p.x < -11.6) p.x = -11.6; if (p.x > 21.6) p.x = 21.6;
+    p.y = Math.max(p.y, 0.7);
+    M.camera.lookAt(cam.target);
+    if (M.post) M.post.uniforms.uFocus.value = p.distanceTo(cam.target);
+  }, 70);
+})();
+// ===== 11-fx.js：火柴火焰、火花、光爆、烛光、升空星、流星、光柱、落点光圈、白气 =====
+(() => {
+  const live = [];
+  const run = (fn) => live.push(fn);            // fn(dt) 返回 false 时移除
+  M.onFrame(dt => { for (let i = live.length - 1; i >= 0; i--) if (live[i](dt) === false) live.splice(i, 1); }, 55);
+  const add = (o, x, y, z) => { o.position.set(x, y, z); M.scene.add(o); return o; };
+  const spriteMat = (color, k, opacity = 1) => new T.SpriteMaterial({ map: M.tex.soft(), color: M.col(color).multiplyScalar(k),
+    transparent: true, opacity, blending: T.AdditiveBlending, depthWrite: false });
+  const wp = new T.Vector3();
+  M.fx = {};
+
+  // ---- 火柴火焰：挂在 parent 上 ----
+  M.fx.flame = (parent, opts = {}) => {
+    const g = new T.Group(); parent.add(g);
+    const outer = new T.Sprite(spriteMat('#ff8a2a', 6)), core = new T.Sprite(spriteMat('#fff0c0', 9));
+    outer.scale.set(0.07, 0.11, 1); core.scale.set(0.03, 0.05, 1); outer.position.y = 0.035; core.position.y = 0.025;
+    const halo = new T.Sprite(spriteMat('#ff9a40', 1.2, 0.5)); halo.scale.setScalar(0.6);
+    g.add(halo, outer, core);
+    const light = M.lights.point('#ff9a3c', 0, opts.dist || 7);
+    let life = 1, dying = 0, t = 0;
+    const h = { group: g, light, kill(f = 0.6) { dying = f; } };
+    run(dt => {
+      t += dt;
+      if (dying) { life -= dt / dying; if (life <= 0) { parent.remove(g); M.lights.release(light); return false; } }
+      const n = 0.8 + 0.2 * Math.sin(t * 31) * Math.sin(t * 17 + 1) + 0.1 * Math.sin(t * 53), grow = Math.min(1, t * 4) * life;
+      outer.scale.set(0.07 * n * grow * (opts.size || 1), 0.12 * (2 - n) * grow * (opts.size || 1), 1); core.scale.set(0.03 * grow, 0.055 * n * grow, 1);
+      halo.material.opacity = 0.5 * grow;
+      if (light) { g.getWorldPosition(wp); light.position.copy(wp); light.intensity = (opts.power || 2.6) * n * grow; }
+    });
+    return h;
+  };
+
+  // ---- 划火花 ----
+  M.fx.strike = (pos) => {
+    const N = 34, geo = new T.BufferGeometry(), P = new Float32Array(N * 3), V = [];
+    for (let i = 0; i < N; i++) { P.set([pos.x, pos.y, pos.z], i * 3); V.push([(Math.random() - .5) * 1.6, Math.random() * 1.8 + 0.4, (Math.random() - .5) * 1.6]); }
+    geo.setAttribute('position', new T.BufferAttribute(P, 3));
+    const pts = new T.Points(geo, new T.PointsMaterial({ color: M.col('#ffb050').multiplyScalar(8), size: 0.025, transparent: true,
+      blending: T.AdditiveBlending, depthWrite: false }));
+    M.scene.add(pts); let t = 0;
+    M.audio && M.audio.strike();
+    run(dt => {
+      t += dt; for (let i = 0; i < N; i++) { V[i][1] -= 4 * dt; P[i * 3] += V[i][0] * dt; P[i * 3 + 1] += V[i][1] * dt; P[i * 3 + 2] += V[i][2] * dt; }
+      geo.attributes.position.needsUpdate = true; pts.material.opacity = Math.max(0, 1 - t / 0.6);
+      if (t > 0.6) { M.scene.remove(pts); geo.dispose(); return false; }
+    });
+  };
+
+  // ---- 光爆 ----
+  M.fx.bloomBurst = (pos, color = '#ffb060', size = 6) => {
+    const s = add(new T.Sprite(spriteMat(color, 3, 1)), pos.x, pos.y, pos.z); let t = 0;
+    M.fx.warmPulse(0.8);
+    run(dt => { t += dt; const k = M.smooth(0, 0.35, t); s.scale.setScalar(0.3 + k * size); s.material.opacity = 1 - M.smooth(0.3, 1.1, t);
+      if (t > 1.1) { M.scene.remove(s); return false; } });
+  };
+  let warm = 0; M.fx.warmPulse = k => { warm = Math.max(warm, k); };
+  M.onFrame(dt => { warm = M.damp(warm, 0, 1.5, dt); M.fx.warmLevel = warm; }, 56);
+
+  // ---- 烛光（圣诞树）----
+  M.fx.candles = (points) => {
+    const N = points.length, geo = new T.BufferGeometry(), P = new Float32Array(N * 3), D = new Float32Array(N), S = new Float32Array(N);
+    const ys = points.map(p => p.y), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    points.forEach((p, i) => { P.set([p.x, p.y + 0.09, p.z], i * 3); D[i] = (p.y - y0) / (y1 - y0) + Math.random() * 0.15; S[i] = Math.random(); });
+    geo.setAttribute('position', new T.BufferAttribute(P, 3)); geo.setAttribute('aD', new T.BufferAttribute(D, 1)); geo.setAttribute('aS', new T.BufferAttribute(S, 1));
+    const U = { uT: { value: -1 }, uTime: { value: 0 }, uScale: { value: 400 }, uHide: { value: 0 } };
+    const pts = new T.Points(geo, new T.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
+      vertexShader: `attribute float aD, aS; uniform float uT, uTime, uScale, uHide; varying float vA;
+        void main(){ vec4 mv = modelViewMatrix*vec4(position,1.); float on = smoothstep(aD, aD+.12, uT) * (1.-uHide);
+          float fl = .75 + .25*sin(uTime*(9.+aS*7.) + aS*40.);
+          gl_PointSize = .5 * fl * on * uScale / -mv.z; vA = on; gl_Position = projectionMatrix*mv; }`,
+      fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord-.5); float a = smoothstep(.5,.0,d);
+        gl_FragColor = vec4(vec3(5.,2.8,1.1)*a*a, a*vA); }` }));
+    pts.frustumCulled = false; M.scene.add(pts);
+    const wax = new T.InstancedMesh(new T.CylinderGeometry(0.018, 0.018, 0.1, 6), M.mat.std('#f4ecd8', 0.6), N), dm = new T.Object3D();
+    points.forEach((p, i) => { dm.position.set(p.x, p.y + 0.03, p.z); dm.updateMatrix(); wax.setMatrixAt(i, dm.matrix); }); M.scene.add(wax);
+    let dur = 2.5, started = -1;
+    run(() => { U.uTime.value = M.time; U.uScale.value = M.renderer.getPixelRatio() * innerHeight * 0.5;
+      if (started >= 0) U.uT.value = (M.time - started) / dur * 1.15; });
+    return { points: pts, uniforms: U, lightUp(d = 2.5) { dur = d; started = M.time; } };
+  };
+
+  // ---- 烛光升空成星 ----
+  M.fx.riseToStars = (points, center, dur = 4.5) => {
+    const N = points.length, geo = new T.BufferGeometry(), A = new Float32Array(N * 3), B = new Float32Array(N * 3), D = new Float32Array(N);
+    points.forEach((p, i) => { A.set([p.x, p.y + 0.09, p.z], i * 3); const a = Math.random() * Math.PI * 2, r = 15 + Math.random() * 55;
+      B.set([center.x + Math.cos(a) * r, 34 + Math.random() * 40, center.z + Math.sin(a) * r - 20], i * 3); D[i] = Math.random() * 0.35; });
+    geo.setAttribute('position', new T.BufferAttribute(A, 3)); geo.setAttribute('aEnd', new T.BufferAttribute(B, 3)); geo.setAttribute('aD', new T.BufferAttribute(D, 1));
+    const U = { uT: { value: 0 }, uTime: { value: 0 }, uScale: { value: 400 }, uFade: { value: 1 } };
+    const pts = new T.Points(geo, new T.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending, fog: false,
+      vertexShader: `attribute vec3 aEnd; attribute float aD; uniform float uT, uTime, uScale; varying float vK; varying float vTw;
+        void main(){ float k = clamp((uT - aD)/(1.-aD), 0., 1.); float e = k*k*(3.-2.*k); vK = e;
+          vec3 p = mix(position, aEnd, e); float sw = sin(e*9. + aD*30.)*(1.-e)*2.; p.x += sw; p.z += cos(e*9.+aD*30.)*(1.-e)*2.;
+          vec4 mv = modelViewMatrix*vec4(p,1.); vTw = .7+.3*sin(uTime*3.+aD*90.);
+          gl_PointSize = mix(.5*uScale/-mv.z, 3.6, e); gl_Position = projectionMatrix*mv; }`,
+      fragmentShader: `uniform float uFade; varying float vK; varying float vTw; void main(){ float d = length(gl_PointCoord-.5); float a = smoothstep(.5,.0,d);
+        vec3 c = mix(vec3(5.,2.8,1.1), vec3(3.,3.4,4.), vK) * vTw; gl_FragColor = vec4(c*a*a, a*uFade); }` }));
+    pts.frustumCulled = false; M.scene.add(pts); let t = 0;
+    run(dt => { t += dt; U.uT.value = Math.min(1, t / dur); U.uTime.value = M.time; U.uScale.value = M.renderer.getPixelRatio() * innerHeight * 0.5;
+      if (M.sky) U.uFade.value = 1 - M.sky.uniforms.uDawn.value; });
+    return { points: pts, endOf: i => new T.Vector3(B[i * 3], B[i * 3 + 1], B[i * 3 + 2]) };
+  };
+
+  // ---- 流星 + 光柱 ----
+  M.fx.shootingStar = (from, to, dur, cb) => {
+    const head = add(new T.Sprite(spriteMat('#fff2d0', 8)), from.x, from.y, from.z); head.scale.setScalar(1.2);
+    const TN = 70, geo = new T.BufferGeometry(), P = new Float32Array(TN * 3), AL = new Float32Array(TN);
+    for (let i = 0; i < TN; i++) { P.set([from.x, from.y, from.z], i * 3); AL[i] = 1 - i / TN; }
+    geo.setAttribute('position', new T.BufferAttribute(P, 3)); geo.setAttribute('aA', new T.BufferAttribute(AL, 1));
+    const trail = new T.Points(geo, new T.ShaderMaterial({ transparent: true, depthWrite: false, blending: T.AdditiveBlending, fog: false,
+      vertexShader: `attribute float aA; varying float vA; void main(){ vA = aA; vec4 mv = modelViewMatrix*vec4(position,1.);
+        gl_PointSize = max(2., 900.*aA/-mv.z); gl_Position = projectionMatrix*mv; }`,
+      fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord-.5); gl_FragColor = vec4(vec3(4.,3.2,2.)*vA*vA, smoothstep(.5,0.,d)*vA); }` }));
+    trail.frustumCulled = false; M.scene.add(trail);
+    const mid = from.clone().lerp(to, 0.5).add(new T.Vector3(0, 6, 0)); let t = 0, done = false;
+    M.audio && M.audio.chime(1);
+    run(dt => {
+      t += dt; const k = Math.min(1, t / dur), e = k * k * (3 - 2 * k) * 0.3 + k * 0.7;
+      const a = from.clone().lerp(mid, e), b = mid.clone().lerp(to, e); head.position.copy(a.lerp(b, e));
+      P.copyWithin(3, 0, (TN - 1) * 3); P.set([head.position.x, head.position.y, head.position.z], 0); geo.attributes.position.needsUpdate = true;
+      if (k >= 1 && !done) { done = true; M.scene.remove(head); M.fx.bloomBurst(to, '#ffd89a', 7); M.fx.column(to); cb && cb(); }
+      if (done) { trail.material.opacity = 1; AL.forEach((v, i) => AL[i] *= 0.9); geo.attributes.aA.needsUpdate = true; if (AL[0] < 0.01) { M.scene.remove(trail); return false; } }
+    });
+  };
+  M.fx.column = (pos) => {
+    const m = new T.Mesh(new T.CylinderGeometry(0.7, 0.9, 14, 24, 1, true), new T.ShaderMaterial({ transparent: true, depthWrite: false,
+      blending: T.AdditiveBlending, side: T.DoubleSide, uniforms: { uA: { value: 0 } },
+      vertexShader: `varying vec2 vUv; varying vec3 vN; varying vec3 vV; void main(){ vUv = uv; vN = normalize(normalMatrix*normal);
+        vec4 mv = modelViewMatrix*vec4(position,1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }`,
+      fragmentShader: `uniform float uA; varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+        void main(){ float f = pow(abs(dot(vN, vV)), 1.5); float a = (1.-vUv.y)*(1.-vUv.y) * f * uA;
+          gl_FragColor = vec4(vec3(3.,2.3,1.3)*a, a); }` }));
+    add(m, pos.x, pos.y + 7, pos.z); let t = 0, fade = 0;
+    M.fx._column = { fade(d = 3) { fade = d; t = 0; } };
+    run(dt => { t += dt; m.material.uniforms.uA.value = fade ? Math.max(0, 1 - t / fade) * 0.8 : Math.min(0.8, t * 1.5);
+      if (fade && t > fade) { M.scene.remove(m); return false; } });
+  };
+
+  // ---- 落点光圈 / 白气 ----
+  M.fx.tapRing = (x, z) => {
+    const m = add(new T.Mesh(new T.RingGeometry(0.16, 0.2, 32), new T.MeshBasicMaterial({ color: M.col('#ffd9a0').multiplyScalar(1.5), transparent: true,
+      blending: T.AdditiveBlending, depthWrite: false })), x, 0.04, z); m.rotation.x = -Math.PI / 2; let t = 0;
+    run(dt => { t += dt; m.scale.setScalar(1 + t * 4); m.material.opacity = 1 - t / 0.6; if (t > 0.6) { M.scene.remove(m); return false; } });
+  };
+  M.fx.breath = (pos) => {
+    const s = add(new T.Sprite(new T.SpriteMaterial({ map: M.tex.soft(), color: 0xdde6ff, transparent: true, opacity: 0.0, depthWrite: false })), pos.x, pos.y, pos.z);
+    let t = 0;
+    run(dt => { t += dt; s.scale.setScalar(0.15 + t * 0.4); s.position.y += dt * 0.12; s.material.opacity = 0.1 * Math.sin(Math.min(1, t / 1.6) * Math.PI);
+      if (t > 1.6) { M.scene.remove(s); return false; } });
+  };
+})();
+// ===== 11b-fireworks.js：新年烟花（上升火种 + 球形爆散）=====
+(() => {
+  const MAX = 1600, P = new Float32Array(MAX * 3), V = new Float32Array(MAX * 3), K = new Float32Array(MAX).fill(1), L = new Float32Array(MAX), C = new Float32Array(MAX * 3);
+  const g = new T.BufferGeometry();
+  g.setAttribute('position', new T.BufferAttribute(P, 3)); g.setAttribute('aK', new T.BufferAttribute(K, 1)); g.setAttribute('aC', new T.BufferAttribute(C, 3));
+  const U = { uScale: { value: 400 }, uTime: { value: 0 } };
+  const pts = new T.Points(g, new T.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending, fog: false,
+    vertexShader: `attribute float aK; attribute vec3 aC; uniform float uScale; varying float vK; varying vec3 vC;
+      void main(){ vK = aK; vC = aC; vec4 mv = modelViewMatrix*vec4(position,1.);
+        gl_PointSize = max(1.5, 1.05 * (1.-aK*.55) * uScale / -mv.z) * step(aK, .999); gl_Position = projectionMatrix*mv; }`,
+    fragmentShader: `uniform float uTime; varying float vK; varying vec3 vC;
+      void main(){ float d = length(gl_PointCoord-.5); float a = smoothstep(.5,0.,d); a *= a;
+        vec3 c = mix(vec3(12.,9.,6.), vC*9., smoothstep(0., .25, vK)) * (1.-vK);
+        float tw = vK > .6 ? step(.5, fract(sin(gl_FragCoord.x*12.9+uTime*40.)*43758.)) : 1.;
+        gl_FragColor = vec4(c*a*tw, a*(1.-vK)); }` }));
+  pts.frustumCulled = false; M.scene.add(pts);
+  let next = 0;
+  const spawn = (x, y, z, vx, vy, vz, life, c) => { const i = next; next = (next + 1) % MAX;
+    P.set([x, y, z], i * 3); V.set([vx, vy, vz], i * 3); K[i] = 0; L[i] = life; C.set([c.r, c.g, c.b], i * 3); };
+  const rockets = [];
+  M.fx.firework = (pos, color = '#ffcc66') => {
+    const c = M.col(color), from = new T.Vector3(pos.x + (Math.random() - 0.5) * 3, 1, pos.z + (Math.random() - 0.5) * 3);
+    rockets.push({ p: from, to: pos.clone(), t: 0, dur: 1.0, c });
+    M.audio && M.audio.whistle && M.audio.whistle();
+  };
+  const tmp = new T.Vector3();
+  M.onFrame(dt => {
+    for (let i = rockets.length - 1; i >= 0; i--) {
+      const r = rockets[i]; r.t += dt; const k = Math.min(1, r.t / r.dur), e = 1 - (1 - k) * (1 - k);
+      tmp.lerpVectors(r.p, r.to, e); spawn(tmp.x, tmp.y, tmp.z, 0, -0.5, 0, 0.5, M.col('#ffb070'));
+      if (k >= 1) {
+        rockets.splice(i, 1);
+        for (let j = 0; j < 220; j++) {
+          const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u), sp = 8 + Math.random() * 3;
+          spawn(r.to.x, r.to.y, r.to.z, Math.cos(a) * s * sp, u * sp, Math.sin(a) * s * sp, 2.0 + Math.random() * 0.8, r.c);
+        }
+        M.fx.bloomBurst && M.fx.bloomBurst(r.to, '#ffe0b0', 10);
+        M.audio && M.audio.boom && M.audio.boom();
+      }
+    }
+    for (let i = 0; i < MAX; i++) {
+      if (K[i] >= 1) continue; K[i] = Math.min(1, K[i] + dt / L[i]);
+      const d = 1 - 1.6 * dt; V[i * 3] *= d; V[i * 3 + 1] = V[i * 3 + 1] * d - 2.2 * dt; V[i * 3 + 2] *= d;
+      P[i * 3] += V[i * 3] * dt; P[i * 3 + 1] += V[i * 3 + 1] * dt; P[i * 3 + 2] += V[i * 3 + 2] * dt;
+    }
+    g.attributes.position.needsUpdate = true; g.attributes.aK.needsUpdate = true; g.attributes.aC.needsUpdate = true;
+    U.uScale.value = M.renderer.getPixelRatio() * innerHeight * 0.5; U.uTime.value = M.time;
+  }, 59);
+})();
+// ===== 12-story.js：站点状态机、时钟、寒冷值、各站演出 =====
+(() => {
+  const G = M.girl, PI = Math.PI, V = (x, y, z) => new T.Vector3(x, y, z);
+  // ---- 基于游戏时间的等待 / 补间 ----
+  const timers = [];
+  M.wait = s => new Promise(res => timers.push({ t: M.time + s, res }));
+  M.tween = (dur, fn) => new Promise(res => { const t0 = M.time; timers.push({ tick: () => { const k = Math.min(1, (M.time - t0) / dur); fn(k * k * (3 - 2 * k), k); return k >= 1; }, res }); });
+  M.onFrame(() => { for (let i = timers.length - 1; i >= 0; i--) { const x = timers[i];
+    if (x.tick ? x.tick() : M.time >= x.t) { timers.splice(i, 1); x.res(); } } }, 20);
+
+  const S = M.story = { step: 0, matches: 5, minutes: 0, cold: 0.3, locked: true, dawn: 0, flame: null, started: false };
+  const NUM = ['一', '二', '三', '四', '五'];
+  const fmt = m => m >= 60 ? '00:00' : '23:' + String(Math.floor(m)).padStart(2, '0');
+  const st = M.props.stove, bk = M.bakery, tree = M.props.tree, gran = M.granny.group.position;
+  let candles = null;
+
+  const stations = [
+    { pos: V(1.0, 0, 9), r: 2.3, mark: V(0.35, 0, 10.45), face: st.focus, title: '第一根火柴',
+      lines: ['铁炉里腾起了火苗，烤得手心发烫。', '她眨了眨眼——火还在。'], next: '沿着运河往北走，面包房的橱窗亮着。',
+      shot: [V(1.9, 1.3, 7.3), V(-0.15, 0.75, 9.65)],
+      async run() {
+        M.fx.bloomBurst(st.pos.clone().add(V(0.45, 0, 0)), '#ff9a40', 4);
+        const fire = new T.Group(); fire.position.set(st.pos.x + 0.47, 0.5, st.pos.z); M.scene.add(fire);
+        M.fx.flame(fire, { size: 2.6, power: 4, dist: 10 });
+        M.ambience.fireAt(V(st.pos.x + 0.4, 0.42, st.pos.z)); M.ambience.smokeAt(V(st.pos.x, 3.05, st.pos.z));
+        const pool = M.lights.pool(st.pos.x + 0.6, st.pos.z, '#ff8a3a', 4, 1.6); pool.material.opacity = 0;
+        M.warm.add({ x: st.pos.x, z: st.pos.z, r: 4.5, power: 1 });
+        M.audio.chime(0); M.audio.fire(true);
+        await M.tween(1.2, k => { st.doorMat.color.copy(M.col('#2a1008')).lerp(M.col('#ff7a2a').multiplyScalar(4), k); pool.material.opacity = k; });
+        M.cam.shot(V(1.4, 1.12, 8.0), V(-0.2, 0.72, 9.7), 0.35);
+        G.setHold('warm'); await M.wait(1.6);
+      } },
+    { pos: V(-1.5, 0, -12.4), r: 2.4, mark: V(-2.0, 0, -14.0), face: bk.window, title: '第二根火柴',
+      lines: ['橱窗里摆好了烤鹅和热面包。', '一只白鹅推开门，摇摇摆摆地走向她。'], next: '白鹅想跟着你。去广场的大冷杉那儿看看。',
+      shot: [V(-0.2, 1.45, -10.2), V(-2.6, 0.95, -13.1)],
+      async run() {
+        M.audio.chime(1);
+        M.fx.bloomBurst(bk.window, '#ffc070', 3);
+        await M.tween(0.8, k => { bk.roomMat.emissiveIntensity = 0.35 + k * 0.5; });
+        const items = bk.items.children;
+        await M.tween(1.4, (k, raw) => items.forEach((m, i) => { const t = M.clamp(raw * items.length * 0.6 - i * 0.5, 0, 1);
+          const b = 1 + Math.sin(t * PI) * 0.25; m.scale.copy(m.userData.s).multiplyScalar(Math.max(0.0001, t * b)); }));
+        M.warm.add({ x: -2.4, z: -12.4, r: 3, power: 0.6 });
+        await M.wait(0.4);
+        await M.tween(0.9, k => { bk.hinge.rotation.y = -1.35 * k; });
+        M.goose.appear(bk.doorOut); G.look(bk.doorOut.clone().setY(0.3));
+        M.cam.shot(V(0.7, 1.6, -9.1), V(-2.5, 0.6, -12.3), 0.5);
+        await M.wait(2.4); G.look(null);
+      } },
+    { pos: V(4, 0, -49.4), r: 3.2, mark: V(5.3, 0, -48.6), face: V(4, 2, -54), title: '第三根火柴',
+      lines: ['一百支蜡烛同时亮起，又升上夜空，变成了星星。', '有一颗星，落向了教堂的台阶。'], next: '流星落在教堂台阶前了。',
+      shot: [V(4.6, 2.1, -39.5), V(4.4, 4.3, -53)],
+      async run() {
+        candles = candles || M.fx.candles(tree.candles);
+        M.audio.chime(2); candles.lightUp(2.6);
+        await M.wait(2.7);
+        tree.starMat.emissiveIntensity = 5; M.fx.bloomBurst(tree.top, '#ffdd88', 4);
+        const tl = M.lights.point('#ffb060', 0, 16); if (tl) tl.position.set(4, 5, -49.5);
+        M.warm.add({ x: 4, z: -54, r: 6.5, power: 0.9 });
+        await M.tween(1, k => { if (tl) tl.intensity = k * 2.6; });
+        await M.wait(0.8);
+        const rise = M.fx.riseToStars(tree.candles, tree.pos, 4.5); M.audio.chime(3);
+        M.cam.focus({ target: V(4, 14, -56), dist: 20, yaw: 0.1, pitch: -0.15, rate: 0.9 });
+        await M.tween(1.2, k => { candles.uniforms.uHide.value = k; });
+        await M.wait(3.6);
+        let landed = false; const to = V(gran.x, 0.3, gran.z);
+        M.cam.shot(V(10.2, 2.4, -44.6), V(4.6, 1.3, -58.5), 1.0);
+        M.fx.shootingStar(rise.endOf(0), to, 2.4, () => { landed = true; });
+        while (!landed) await M.wait(0.1);
+        await M.tween(1.5, k => { candles.uniforms.uHide.value = 1 - k * 0.7; });
+      } },
+    { pos: V(4, 0, -60.4), r: 2.0, mark: V(3.6, 0, -60.2), face: V(4, 1.2, -62.3), title: '第四根火柴',
+      lines: ['光里走出来一个人。', '“我的小姑娘，奶奶来接你了。”'], next: '只剩最后一根火柴了。',
+      shot: [V(5.0, 1.35, -57.5), V(3.9, 1.2, -62.0)],
+      async run() {
+        M.audio.chime(4); M.granny.show(2.6); M.audio.pad([53, 57, 60, 64], 8, 0.06, 0.6);
+        M.cam.shot(V(4.8, 1.33, -58.1), V(3.9, 1.22, -62.0), 0.3);
+        await M.wait(2.8); M.fx._column && M.fx._column.fade(3);
+        G.look(V(gran.x, 1.45, gran.z)); M.granny.pose('reach');
+        M.warm.add({ x: gran.x, z: gran.z, r: 4, power: 1 });
+        M.cam.shot(V(7.4, 1.3, -60.2), V(3.85, 1.05, -61.3), 0.55);
+        await M.wait(1.8);
+      } },
+    { pos: V(4, 0, -60.4), r: 2.0, mark: V(3.6, 0, -60.2), face: V(4, 1.2, -62.3), title: '最后一根火柴',
+      lines: ['这一次，她没有被带走。', '奶奶牵着她，在新年的钟声里回了家。'], next: '',
+      shot: [V(7.4, 1.3, -60.2), V(3.85, 1.05, -61.3)],
+      async run() {
+        const from = G.pos.clone(), to = V(gran.x, 0, gran.z + 0.55);
+        M.cam.shot(V(6.8, 1.3, -60.7), V(3.95, 1.05, -61.6), 0.6);
+        await M.tween(1.0, k => { G.pos.lerpVectors(from, to, k); G.speed = k < 1 ? 0.8 : 0; });
+        G.speed = 0; G.heading = PI; G.setHold('hug'); M.granny.pose('hug'); M.goose.sit();
+        S.flame && S.flame.kill(1.5); S.flame = null;
+        M.fx.bloomBurst(V(gran.x, 1.1, gran.z), '#ffe0b0', 9); M.audio.pad([48, 55, 59, 62, 64], 9, 0.065);
+        M.cam.shot(V(5.0, 1.5, -63.6), V(3.95, 1.0, -61.6), 1.2);
+        await M.wait(1.4);
+        M.cam.shot(V(4.7, 1.42, -63.2), V(3.95, 1.0, -61.6), 0.15);
+      } },
+  ];
+  S.stations = stations;
+
+  const setClock = (target, dur = 1.2) => { const a = S.minutes; return M.tween(dur, k => { S.minutes = a + (target - a) * k; M.ui.setClock(fmt(S.minutes)); }); };
+
+  S.strike = async () => {
+    const s = stations[S.step]; if (!s || S.locked || S.matches <= 0) return;
+    S.locked = true; M.ui.action(null); M.control.stop(); M.ui.cinema(true); M.audio.duck(0.45);
+    if (S.step === 4) M.ui.hint('');
+    M.cam.shot(s.shot[0], s.shot[1], 1.1);
+    if (s.mark && S.step !== 4) await M.control.goto(s.mark.x, s.mark.z);
+    const h0 = G.heading, h1 = Math.atan2(s.face.x - G.pos.x, s.face.z - G.pos.z);
+    let dh = Math.atan2(Math.sin(h1 - h0), Math.cos(h1 - h0));
+    await M.tween(0.45, k => { G.heading = h0 + dh * k; });
+    if (S.flame) { S.flame.kill(0.4); S.flame = null; }
+    G.setHold(null);
+    await new Promise(res => G.play('strike', res, () => {
+      S.flame = M.fx.flame(G.hand); const p = new T.Vector3(); G.hand.getWorldPosition(p); M.fx.strike(p);
+      M.fx.warmPulse(1); M.audio.flame(true);
+    }));
+    S.matches--; M.ui.setMatches(S.matches);
+    setClock(S.step === 4 ? 60 : S.minutes + 12);
+    await s.run();
+    M.ui.caption(s.title, s.lines, S.step === 4 ? 7.5 : 30);
+    if (S.step === 4) { await M.wait(3.2); return S.ending(); }
+    await M.wait(3.6);
+    if (S.step !== 3) { S.flame && S.flame.kill(1.2); S.flame = null; M.audio.flame(false); }
+    if (S.step !== 0) G.setHold(null);
+    M.ui.cinema(false); M.ui.hideCaption(); M.audio.duck(1, 1.2);
+    M.cam.release();
+    S.step++; S.locked = false;
+    M.ui.hint(s.next);
+  };
+
+
+  // ---- 每帧：寒冷、提示按钮、白气 ----
+  let breathT = 0;
+  M.onFrame(dt => {
+    if (!S.started) return;
+    const near0 = M.warm.at(G.pos.x, G.pos.z), warm = near0 + (S.flame ? 0.35 : 0);
+    G.warmNear = near0;
+    S.cold = M.clamp(S.cold + (0.006 - warm * 0.09) * dt, 0.05, 1);
+    if (S.dawn > 0) S.cold = M.damp(S.cold, 0.05, 1, dt);
+    G.cold = S.cold;
+    M.post.uniforms.uCold.value = S.cold * (1 - S.dawn);
+    M.post.uniforms.uWarm.value = (M.fx.warmLevel || 0) * 0.6 + warm * 0.15;
+    if (!S.locked) {
+      const s = stations[S.step];
+      const near = s && Math.hypot(G.pos.x - s.pos.x, G.pos.z - s.pos.z) < s.r;
+      M.ui.action(near ? `划亮第${NUM[S.step]}根火柴` : null);
+      if (S.cold > 0.85 && !near) M.ui.hint('好冷……到有光的地方去。', true);
+    }
+    breathT -= dt;
+    if (S.cold > 0.4 && breathT < 0 && S.dawn < 0.5) { breathT = 2.6 - 1.4 * S.cold;
+      M.fx.breath(V(G.pos.x + Math.sin(G.heading) * 0.22, 1.08, G.pos.z + Math.cos(G.heading) * 0.22)); }
+  }, 45);
+
+  S.start = () => {
+    S.started = true; S.locked = false; M.control.enabled = true;
+    M.ui.hint('街角的炉亭里有只旧铁炉。去那儿，划一根火柴吧。');
+  };
+  M.debug = { jump(n) { const s = stations[n]; S.step = n; S.matches = 5 - n; M.ui.setMatches(S.matches);
+    G.pos.set(s.pos.x + 0.3, 0, s.pos.z + 1.2); M.cam.snap(); } };
+})();
+// ===== 12b-guide.js：引路小光（指向下一站点）=====
+(() => {
+  const S = M.story, G = M.girl;
+  const sMat = (c, k, o) => new T.SpriteMaterial({ map: M.tex.soft(), color: M.col(c).multiplyScalar(k), transparent: true, opacity: o,
+    blending: T.AdditiveBlending, depthWrite: false });
+  const wisp = new T.Group(); M.scene.add(wisp);
+  const core = new T.Sprite(sMat('#fff0c8', 6, 1)); core.scale.setScalar(0.16);
+  const halo = new T.Sprite(sMat('#ffb050', 1.6, 0.45)); halo.scale.setScalar(0.9);
+  wisp.add(halo, core);
+  const N = 20, P = new Float32Array(N * 3), A = new Float32Array(N);
+  for (let i = 0; i < N; i++) A[i] = 1 - i / N;
+  const tg = new T.BufferGeometry(); tg.setAttribute('position', new T.BufferAttribute(P, 3)); tg.setAttribute('aA', new T.BufferAttribute(A, 1));
+  const tU = { uFade: { value: 0 }, uScale: { value: 400 } };
+  const trail = new T.Points(tg, new T.ShaderMaterial({ uniforms: tU, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
+    vertexShader: `attribute float aA; uniform float uScale; varying float vA; void main(){ vA = aA; vec4 mv = modelViewMatrix*vec4(position,1.);
+      gl_PointSize = .07*aA*uScale/-mv.z; gl_Position = projectionMatrix*mv; }`,
+    fragmentShader: `uniform float uFade; varying float vA; void main(){ float d = length(gl_PointCoord-.5);
+      gl_FragColor = vec4(vec3(4.,2.4,1.)*vA, smoothstep(.5,0.,d)*vA*uFade); }` }));
+  trail.frustumCulled = false; M.scene.add(trail);
+  const pool = M.lights.pool(0, 0, '#ffc070', 1.3, 0.8);
+  const pos = new T.Vector3(1, 1.2, 9), tgt = new T.Vector3();
+  let fade = 0, inited = false;
+  M.guide = { group: wisp };
+  // 去广场的站点先经过路口，避免穿墙
+  const waypoint = st => (st.pos.z < -44.5 && G.pos.z > -43.5) ? new T.Vector3(1.5, 0, -45.5) : st.pos;
+  M.onFrame(dt => {
+    const st = S.stations && S.stations[S.step];
+    const show = S.started && !S.locked && st && S.dawn === 0;
+    fade = M.damp(fade, show ? 1 : 0, show ? 1.5 : 5, dt);
+    if (st) {
+      const dSt = Math.hypot(G.pos.x - st.pos.x, G.pos.z - st.pos.z), t = M.time;
+      if (dSt < 4) {
+        tgt.set(st.pos.x + Math.cos(t * 1.6) * 0.5, 1.3 + Math.sin(t * 2.2) * 0.12, st.pos.z + Math.sin(t * 1.6) * 0.5);
+      } else {
+        const w = waypoint(st), dx = w.x - G.pos.x, dz = w.z - G.pos.z, d = Math.hypot(dx, dz) || 1, k = Math.min(2.6, d);
+        tgt.set(G.pos.x + dx / d * k + Math.sin(t * 1.3) * 0.25, 1.2 + Math.sin(t * 2.4) * 0.15, G.pos.z + dz / d * k);
+      }
+      if (!inited || fade < 0.02) { pos.copy(tgt); inited = true; }
+      const r = 1 - Math.exp(-2.2 * dt); pos.lerp(tgt, r);
+    }
+    wisp.position.copy(pos);
+    const nearK = M.smooth(1.4, 3.2, pos.distanceTo(M.camera.position)), vis = fade * nearK;
+    const pulse = 0.85 + 0.15 * Math.sin(M.time * 4.2);
+    core.material.opacity = vis; halo.material.opacity = 0.45 * vis * pulse; halo.scale.setScalar(0.8 + 0.2 * pulse);
+    P.copyWithin(3, 0, (N - 1) * 3); P[0] = pos.x; P[1] = pos.y; P[2] = pos.z; tg.attributes.position.needsUpdate = true;
+    tU.uFade.value = vis; tU.uScale.value = M.renderer.getPixelRatio() * innerHeight * 0.5;
+    pool.position.set(pos.x, 0.03, pos.z); pool.material.opacity = fade * (1 - S.dawn);
+  }, 46);
+})();
+// ===== 12c-ambience.js：炊烟、炉火火舌与火星、窗中人影 =====
+(() => {
+  const S = M.story, rnd = M.rand(404);
+  const scaleU = () => M.renderer.getPixelRatio() * innerHeight * 0.5;
+  // 通用粒子池：CPU 更新位置与年龄，shader 按年龄着色
+  const pool = (max, frag, blending, sizeExpr) => {
+    const P = new Float32Array(max * 3), AGE = new Float32Array(max).fill(1), LIFE = new Float32Array(max).fill(1), SEED = new Float32Array(max), V = new Float32Array(max * 3);
+    const g = new T.BufferGeometry();
+    g.setAttribute('position', new T.BufferAttribute(P, 3)); g.setAttribute('aK', new T.BufferAttribute(AGE, 1)); g.setAttribute('aS', new T.BufferAttribute(SEED, 1));
+    const U = { uScale: { value: 400 }, uDawn: { value: 0 } };
+    const pts = new T.Points(g, new T.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, blending,
+      vertexShader: `attribute float aK, aS; uniform float uScale; varying float vK; varying float vS;
+        void main(){ vK = aK; vS = aS; vec4 mv = modelViewMatrix*vec4(position,1.); gl_PointSize = (${sizeExpr}) * uScale / -mv.z * step(aK, .999);
+          gl_Position = projectionMatrix*mv; }`,
+      fragmentShader: `uniform float uDawn; varying float vK; varying float vS; ${frag}` }));
+    pts.frustumCulled = false; M.scene.add(pts);
+    let next = 0;
+    return { P, AGE, LIFE, SEED, V, U, g, max,
+      spawn(x, y, z, vx, vy, vz, life, seed = rnd()) { const i = next; next = (next + 1) % max;
+        P[i * 3] = x; P[i * 3 + 1] = y; P[i * 3 + 2] = z; V[i * 3] = vx; V[i * 3 + 1] = vy; V[i * 3 + 2] = vz; AGE[i] = 0; LIFE[i] = life; SEED[i] = seed; },
+      step(dt, grav = 0, drag = 0) {
+        for (let i = 0; i < max; i++) { if (AGE[i] >= 1) continue; AGE[i] = Math.min(1, AGE[i] + dt / LIFE[i]);
+          V[i * 3 + 1] += grav * dt; const d = 1 - drag * dt; V[i * 3] *= d; V[i * 3 + 2] *= d;
+          P[i * 3] += V[i * 3] * dt; P[i * 3 + 1] += V[i * 3 + 1] * dt; P[i * 3 + 2] += V[i * 3 + 2] * dt; }
+        g.attributes.position.needsUpdate = true; g.attributes.aK.needsUpdate = true; g.attributes.aS.needsUpdate = true;
+        U.uScale.value = scaleU(); U.uDawn.value = S ? S.dawn : 0; } };
+  };
+
+  // ---- 炊烟 ----
+  const smoke = pool(520, `void main(){ float d = length(gl_PointCoord-.5); float a = smoothstep(.5,.1,d) * sin(vK*3.1416) * .2;
+      vec3 c = mix(vec3(.16,.18,.24), vec3(.6,.6,.65), uDawn); gl_FragColor = vec4(c, a); }`, T.NormalBlending, '(.5 + vK*2.4) * (.8+vS*.4)');
+  const emitters = [];
+  const ch = M.town.chimneys.slice().sort(() => rnd() - 0.5).slice(0, 16);
+  ch.forEach(p => emitters.push({ p, t: rnd() * 0.5 }));
+  M.ambience = { smokeAt: p => emitters.push({ p: p.clone(), t: 0 }) };
+
+  // ---- 炉火：火舌 + 火星 ----
+  const fire = pool(160, `void main(){ float d = length(gl_PointCoord-.5); float a = smoothstep(.5,0.,d);
+      vec3 c = vS < .8 ? mix(vec3(5.,3.2,1.2), vec3(2.2,.5,.1), vK) : vec3(6.,3.,1.);
+      gl_FragColor = vec4(c*a, a*(1.-vK)); }`, T.AdditiveBlending, 'aS < .8 ? .16*(1.-vK*.6) : .035');
+  const fires = [];
+  M.ambience.fireAt = p => { fires.push({ p: p.clone(), t: 0, s: 0 }); };
+
+  M.onFrame(dt => {
+    for (const e of emitters) { e.t -= dt; if (e.t < 0) { e.t = 0.45 + rnd() * 0.2;
+      smoke.spawn(e.p.x + (rnd() - .5) * .2, e.p.y, e.p.z + (rnd() - .5) * .2, 0.25 + rnd() * 0.1, 0.45 + rnd() * 0.15, (rnd() - .5) * 0.1, 6 + rnd() * 2); } }
+    smoke.step(dt);
+    for (const f of fires) {
+      f.t -= dt; f.s -= dt;
+      while (f.t < 0) { f.t += 1 / 45; const a = rnd() * 6.28, r = rnd() * 0.08;
+        fire.spawn(f.p.x + Math.cos(a) * r, f.p.y, f.p.z + Math.sin(a) * r, (rnd() - .5) * .1, 0.5 + rnd() * 0.5, (rnd() - .5) * .1, 0.45 + rnd() * 0.4, rnd() * 0.79); }
+      if (f.s < 0) { f.s = 0.15 + rnd() * 0.5;
+        fire.spawn(f.p.x, f.p.y + 0.1, f.p.z, (rnd() - .3) * 1.2, 1.4 + rnd() * 1.2, (rnd() - .5) * 1.2, 1.1 + rnd() * 0.4, 0.85); }
+    }
+    fire.step(dt, -0.6, 0.6);
+  }, 57);
+
+  // ---- 窗中人影 ----
+  const cand = M.town.lit.filter(w => { const s = new T.Vector3(), p = new T.Vector3(); w.m.decompose(p, new T.Quaternion(), s);
+    return s.x > 0.5 && p.y < 6 && w.k > 1.2 && Math.abs(p.z + 12) < 45; }).sort(() => rnd() - 0.5).slice(0, 10);
+  const figs = cand.map((w, i) => {
+    const U = { uX: { value: -1 }, uA: { value: 0.85 }, uSway: { value: 0 } };
+    const m = new T.Mesh(new T.PlaneGeometry(1, 1), new T.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+      fragmentShader: `uniform float uX, uA, uSway; varying vec2 vUv;
+        void main(){ vec2 p = (vUv - vec2(uX + uSway, 0.)) * vec2(.7, 1.06);
+          float head = smoothstep(.12, .1, length(p - vec2(0., .66)));
+          float body = smoothstep(1.02, .95, length((p - vec2(0., .12)) / vec2(.23, .36)));
+          float a = max(head, body) * uA; if (a < .01) discard; gl_FragColor = vec4(.1,.045,.02, a); }` }));
+    m.matrixAutoUpdate = false; m.matrix.copy(w.m).multiply(new T.Matrix4().makeTranslation(0, 0, 0.004)); M.scene.add(m);
+    return { U, mode: i % 3 === 0 ? 'idle' : 'pause', t: rnd() * 8, x: 0.3 + rnd() * 0.4, dir: rnd() < 0.5 ? 1 : -1, sp: 0.15 + rnd() * 0.1 };
+  });
+  M.onFrame(dt => {
+    const dawn = S ? S.dawn : 0;
+    for (const f of figs) {
+      f.t -= dt;
+      if (f.mode === 'idle') { f.U.uX.value = f.x; f.U.uSway.value = Math.sin(M.time * 0.7 + f.x * 9) * 0.03; }
+      else if (f.mode === 'pause') { f.U.uX.value = -1; if (f.t < 0) { f.mode = 'walk'; f.dir = rnd() < 0.5 ? 1 : -1; f.x = f.dir > 0 ? -0.4 : 1.4; } }
+      else { f.x += f.dir * f.sp * dt; f.U.uX.value = f.x; if (f.x < -0.45 || f.x > 1.45) { f.mode = 'pause'; f.t = 5 + rnd() * 10; } }
+      f.U.uA.value = 0.85 * (1 - dawn);
+    }
+  }, 58);
+})();
+// ===== 12d-camfx.js：镜头遮挡淡出（近相机 + 视线圆柱，抖动隐藏）=====
+(() => {
+  const U = { uNfCam: { value: new T.Vector3() }, uNfTgt: { value: new T.Vector3() }, uNfOn: { value: 1 } };
+  M.camfx = { uniforms: U };
+  const skip = new Set();
+  [M.girl && M.girl.group, M.granny && M.granny.group, M.goose && M.goose.group].forEach(g => g && g.traverse(o => {
+    if (o.material) [].concat(o.material).forEach(m => skip.add(m));
+  }));
+  const VERT_HEAD = 'varying vec3 vNfW;\nvarying float vNfD;\n';
+  const VERT_BODY = `#include <project_vertex>
+    vec4 nfW = vec4(transformed, 1.0);
+    #ifdef USE_INSTANCING
+      nfW = instanceMatrix * nfW;
+    #endif
+    nfW = modelMatrix * nfW; vNfW = nfW.xyz; vNfD = -mvPosition.z;`;
+  const FRAG_HEAD = `varying vec3 vNfW;\nvarying float vNfD;\nuniform vec3 uNfCam; uniform vec3 uNfTgt; uniform float uNfOn;
+    float nfIGN(vec2 p){ return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }\n`;
+  const FRAG_BODY = `#include <clipping_planes_fragment>
+    if (uNfOn > 0.5 && vNfW.y > 0.12) {
+      float hideK = 1.0 - smoothstep(1.1, 2.1, vNfD);
+      vec3 ab = uNfTgt - uNfCam; float L = length(ab);
+      float t = clamp(dot(vNfW - uNfCam, ab) / (L * L), 0.0, 1.0);
+      float dl = length(vNfW - (uNfCam + ab * t));
+      float front = step(t * L, L - 0.8);
+      hideK = max(hideK, front * (1.0 - smoothstep(0.35, 0.6, dl)) * 0.92);
+      if (hideK > 0.0 && nfIGN(gl_FragCoord.xy) < hideK) discard;
+    }`;
+  const patch = m => {
+    if (skip.has(m) || m.userData.nf || m.isShaderMaterial || m.isRawShaderMaterial || m.isSpriteMaterial || m.isPointsMaterial) return;
+    if (m.blending === T.AdditiveBlending) return;
+    m.userData.nf = true;
+    const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey();
+    m.onBeforeCompile = function (sh, r) {
+      if (prev) prev.call(this, sh, r);
+      Object.assign(sh.uniforms, U);
+      sh.vertexShader = VERT_HEAD + sh.vertexShader.replace('#include <project_vertex>', VERT_BODY);
+      sh.fragmentShader = FRAG_HEAD + sh.fragmentShader.replace('#include <clipping_planes_fragment>', FRAG_BODY);
+    };
+    m.customProgramCacheKey = () => prevKey + '|nf';
+    m.needsUpdate = true;
+  };
+  M.scene.traverse(o => { if (o.isMesh || o.isInstancedMesh) [].concat(o.material).forEach(patch); });
+  M.camfx.patch = patch;
+  M.onFrame(() => {
+    U.uNfCam.value.copy(M.camera.position);
+    U.uNfOn.value = M.story && M.story.started ? 1 : 0;
+    const s = M.camfx.subject;
+    if (s) U.uNfTgt.value.copy(s); else U.uNfTgt.value.set(M.girl.pos.x, 0.85, M.girl.pos.z);
+  }, 72);
+})();
+// ===== 12e-ending.js：结局演出（拥抱 → 钟声烟花 → 天亮的台阶 → 结局卡）=====
+(() => {
+  const S = M.story, G = M.girl, PI = Math.PI, V = (x, y, z) => new T.Vector3(x, y, z);
+  const gran = M.granny.group.position;
+  S.ending = async () => {
+    M.audio.music(null); M.audio.duck(0.2, 1.5); M.audio.bells(12);
+    const fog0 = M.scene.fog.color.clone(), fog1 = M.col('#c9d4e6'), litK = M.town.litMat.color.clone();
+    const lampK = M.props.lampMat.color.clone(), ringC = M.sky.ring.material.color.clone();
+    // 1. 拥抱特写再停一会儿
+    await M.wait(2.2);
+    M.ui.hideCaption();
+    // 2. 后退上升：人物在画面下方，教堂与烟花在上方
+    M.cam.shot(V(12.0, 1.8, -34.5), V(5.3, 7.6, -58), 0.28);
+    await M.wait(3.2);
+    const cols = ['#ffcc66', '#ff5a4a', '#5ae0c8', '#ffffff', '#ffb040', '#8ab4ff', '#ff7ab0', '#ffe08a', '#ff6a3a'];
+    for (let i = 0; i < 9; i++) {
+      M.fx.firework(V(-1 + Math.random() * 12, 10.5 + Math.random() * 4, -54 + Math.random() * 8), cols[i]);
+      await M.wait(0.75 + Math.random() * 0.55);
+    }
+    await M.wait(1.6);
+    // 3. 天亮：两人松开，并肩站在台阶前；镜头回落到 3/4 中景
+    G.setHold(null); M.granny.pose('reach');
+    M.cam.shot(V(6.2, 1.7, -57.4), V(4.4, 0.95, -61.6), 0.22);
+    (async () => {
+      await M.control.goto(gran.x + 0.75, gran.z + 0.55);
+      const h0 = G.heading;
+      await M.tween(1.2, k => { G.heading = h0 + Math.atan2(Math.sin(0.25 - h0), Math.cos(0.25 - h0)) * k; });
+      G.look(V(gran.x, 1.45, gran.z));
+      await M.wait(1.6); G.look(null);
+    })();
+    M.audio.dawn();
+    await M.tween(10, k => {
+      S.dawn = k;
+      M.sky.uniforms.uDawn.value = k; M.canal.uniforms.uDawn.value = k; M.post.uniforms.uDawn.value = k;
+      M.scene.fog.color.copy(fog0).lerp(fog1, k); M.scene.fog.density = M.lerp(0.022, 0.011, k);
+      M.town.litMat.color.copy(litK).multiplyScalar(1 - k * 0.8); M.props.lampMat.color.copy(lampK).multiplyScalar(1 - k * 0.85);
+      M.town.facadeWarm.value = 1 - k * 0.8;
+      M.sky.ring.material.color.copy(ringC).lerp(M.col('#e6d9d6'), k); M.sky.ring.material.opacity = 1 - k * 0.55;
+      M.lights.pools.forEach(p => { p.material.opacity = 1 - k; });
+      if (M.env) { M.env.moon.intensity = M.lerp(0.75, 2.2, k); M.env.moon.color.copy(M.col('#a9b9e6')).lerp(M.col('#ffd8b0'), k);
+        M.env.hemi.intensity = M.lerp(0.9, 1.4, k); }
+    });
+    // 4. 结局卡：镜头再缓缓拉远一点，人物留在下半屏
+    M.cam.shot(V(7.0, 2.2, -55.6), V(4.4, 1.7, -61.6), 0.12);
+    M.audio.duck(1, 1); M.audio.music('major');
+    M.ui.ending();
+  };
+})();
+// ===== 13-audio.js：WebAudio 全合成（风、脚步、划火柴、火焰、八音盒、钟声、白鹅）=====
+(() => {
+  let ctx = null, master, verb, noiseBuf, wind, windF, flameG, fireG, muted = false;
+  let musicIn, musicLP, duckG, waterG, waterF, an, anBuf;
+  const A = M.audio = {};
+  const now = () => ctx.currentTime;
+  const env = (g, t, a, peak, d) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
+  const noiseSrc = () => { const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.loop = true; return s; };
+  A.init = () => {
+    if (ctx) { ctx.resume(); return; }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ctx.createDynamicsCompressor(); comp.connect(ctx.destination);
+    an = ctx.createAnalyser(); an.fftSize = 2048; anBuf = new Float32Array(an.fftSize); comp.connect(an);
+    master = ctx.createGain(); master.gain.value = 0.9; master.connect(comp);
+    // 音乐与环境风走"闪避"总线；音乐另经冷暖低通
+    duckG = ctx.createGain(); duckG.connect(master);
+    musicLP = ctx.createBiquadFilter(); musicLP.type = 'lowpass'; musicLP.frequency.value = 4000; musicLP.Q.value = 0.4;
+    musicIn = ctx.createGain(); musicIn.connect(musicLP); musicLP.connect(duckG);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    // 混响冲激
+    const ir = ctx.createBuffer(2, ctx.sampleRate * 2.8, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const x = ir.getChannelData(c); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / x.length, 3.2); }
+    verb = ctx.createConvolver(); verb.buffer = ir; const vg = ctx.createGain(); vg.gain.value = 0.55; verb.connect(vg); vg.connect(master);
+    // 风
+    const ws = noiseSrc(); windF = ctx.createBiquadFilter(); windF.type = 'bandpass'; windF.frequency.value = 500; windF.Q.value = 0.8;
+    wind = ctx.createGain(); wind.gain.value = 0.0; ws.connect(windF); windF.connect(wind); wind.connect(duckG); ws.start();
+    // 运河拍岸
+    const wsrc = noiseSrc(); waterF = ctx.createBiquadFilter(); waterF.type = 'bandpass'; waterF.frequency.value = 380; waterF.Q.value = 1.4;
+    waterG = ctx.createGain(); waterG.gain.value = 0; wsrc.connect(waterF); waterF.connect(waterG); waterG.connect(master); wsrc.start(0, 0.7);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) ctx.suspend(); else ctx.resume(); });
+    // 火柴火焰 / 炉火底噪
+    const mk = () => { const s = noiseSrc(), f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 700; const g = ctx.createGain(); g.gain.value = 0;
+      s.connect(f); f.connect(g); g.connect(master); s.start(); return g; };
+    flameG = mk(); fireG = mk();
+    A.music('night');
+  };
+  A.setMuted = m => { muted = m; if (ctx) master.gain.setTargetAtTime(m ? 0 : 0.9, now(), 0.15); };
+  A.isMuted = () => muted;
+  A.duck = (k, tc = 0.6) => { if (ctx) duckG.gain.setTargetAtTime(k, now(), tc); };
+  A.level = () => { if (!ctx) return null; an.getFloatTimeDomainData(anBuf); let s = 0, p = 0;
+    for (const v of anBuf) { s += v * v; p = Math.max(p, Math.abs(v)); } return { rms: Math.sqrt(s / anBuf.length), peak: p, state: ctx.state }; };
+
+  const burst = (dur, type, freq, gain, pan = 0, at = 0, q = 0.7, f2) => {
+    const t = now() + at, s = ctx.createBufferSource(); s.buffer = noiseBuf;
+    const f = ctx.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(freq, t); f.Q.value = q;
+    if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    const g = ctx.createGain(); env(g, t, 0.004, gain, dur);
+    const p = ctx.createStereoPanner(); p.pan.value = pan;
+    s.connect(f); f.connect(g); g.connect(p); p.connect(master); s.start(t, Math.random()); s.stop(t + dur + 0.05);
+  };
+  // 雪地脚步：几粒高频"嘎吱"+ 一声闷响，走得越慢颗粒越少
+  A.step = side => { if (!ctx) return;
+    const n = 2 + Math.round(Math.min(1, (M.girl ? M.girl.speed : 1) / 1.6) * 3); let at = 0;
+    for (let i = 0; i < n; i++) { burst(0.016 + Math.random() * 0.02, 'highpass', 1800 + Math.random() * 2400, 0.045 + Math.random() * 0.04, side * 0.25, at, 0.8);
+      at += 0.006 + Math.random() * 0.009; }
+    burst(0.09, 'lowpass', 380, 0.07, side * 0.2, 0.004); };
+  A.strike = () => { if (!ctx) return; burst(0.13, 'bandpass', 3500, 0.5, 0.1, 0, 1.2, 1400); burst(0.3, 'lowpass', 900, 0.3, 0, 0.1, 0.7, 300); };
+  A.flame = on => { if (ctx) flameG.gain.setTargetAtTime(on ? 0.05 : 0, now(), 0.3); };
+  let fireOn = false; A.fire = on => { fireOn = on; };
+
+  const tone = (freq, t, dur, gain, type = 'sine', toVerb = 0.6, dest = master) => {
+    const o = ctx.createOscillator(); o.type = type; o.frequency.value = freq;
+    const g = ctx.createGain(); env(g, t, 0.005, gain, dur);
+    o.connect(g); g.connect(dest); if (toVerb) { const s = ctx.createGain(); s.gain.value = toVerb; g.connect(s); s.connect(verb); }
+    o.start(t); o.stop(t + dur + 0.1);
+  };
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  const box = (m, t, g = 0.09, dest = master) => { tone(mtof(m), t, 1.8, g, 'sine', 0.6, dest); tone(mtof(m) * 4, t, 0.6, g * 0.18, 'sine', 0.6, dest); tone(mtof(m) * 2.01, t, 1.0, g * 0.25, 'sine', 0.6, dest); };
+  // 暖色和弦垫音：每个音两只略微失谐的三角波，慢起慢落
+  A.pad = (notes, dur = 7, g = 0.06, at = 0) => { if (!ctx) return; const t = now() + at, per = g / notes.length;
+    notes.forEach(m => [-7, 7].forEach(cents => {
+      const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = mtof(m); o.detune.value = cents;
+      const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1600;
+      const gg = ctx.createGain(); gg.gain.setValueAtTime(0.0001, t); gg.gain.exponentialRampToValueAtTime(per, t + 1.6);
+      gg.gain.setValueAtTime(per, t + Math.max(1.7, dur - 3.5)); gg.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      const s = ctx.createGain(); s.gain.value = 0.8;
+      o.connect(f); f.connect(gg); gg.connect(master); gg.connect(s); s.connect(verb); o.start(t); o.stop(t + dur + 0.1); })); };
+  A.dawn = () => [[48, 55, 60, 64], [47, 55, 59, 62], [45, 52, 57, 60], [41, 53, 57, 60]].forEach((c, i) => A.pad(c, 6.5, 0.055, i * 4));
+  A.chime = n => { if (!ctx) return; const pent = [0, 2, 4, 7, 9, 12, 14, 16], base = 79 + [0, 2, -3, 5, 7][n % 5];
+    for (let i = 0; i < 6; i++) box(base + pent[i], now() + i * 0.09, 0.07); };
+  A.honk = () => { if (!ctx) return; for (let k = 0; k < 2; k++) { const t = now() + k * 0.22, o = ctx.createOscillator(); o.type = 'sawtooth';
+    o.frequency.setValueAtTime(320, t); o.frequency.linearRampToValueAtTime(430, t + 0.06); o.frequency.linearRampToValueAtTime(340, t + 0.16);
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1000; f.Q.value = 2.5; const g = ctx.createGain(); env(g, t, 0.01, 0.16, 0.16);
+    o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t + 0.25); } };
+  A.boom = () => { if (!ctx) return; const t = now(), o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(38, t + 0.5); env(g, t, 0.005, 0.45, 0.7);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.8);
+    burst(0.5, 'lowpass', 900, 0.35, (Math.random() - 0.5) * 0.6);
+    for (let i = 0; i < 14; i++) burst(0.02, 'highpass', 3000 + Math.random() * 3000, 0.08, Math.random() * 1.6 - 0.8, 0.25 + Math.random() * 1.4); };
+  A.whistle = () => { if (!ctx) return; const t = now(), o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+    o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(2600, t + 0.9); env(g, t, 0.05, 0.025, 0.85);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + 1); };
+  A.bells = n => { if (!ctx) return; const parts = [[1, 1], [2, 0.6], [2.4, 0.4], [3, 0.3], [4.2, 0.2], [5.4, 0.12]];
+    for (let i = 0; i < n; i++) { const t = now() + 0.5 + i * 1.7; parts.forEach(([r, a]) => tone(130.8 * r, t, 5.5 * (1.2 - r * 0.12), 0.11 * a, 'sine', 0.8)); } };
+
+  // ---- 八音盒《平安夜》（Gruber 1818，公有领域）----
+  const SN = [[67, 1.5], [69, .5], [67, 1], [64, 3], [67, 1.5], [69, .5], [67, 1], [64, 3], [74, 2], [74, 1], [71, 3], [72, 2], [72, 1], [67, 3],
+    [69, 2], [69, 1], [72, 1.5], [71, .5], [69, 1], [67, 1.5], [69, .5], [67, 1], [64, 3], [69, 2], [69, 1], [72, 1.5], [71, .5], [69, 1],
+    [67, 1.5], [69, .5], [67, 1], [64, 3], [74, 2], [74, 1], [77, 1.5], [74, .5], [71, 1], [72, 3], [76, 3],
+    [72, 1.5], [67, .5], [64, 1], [67, 1.5], [65, .5], [62, 1], [60, 6]];
+  let seq = null;
+  A.music = mode => { if (!ctx) return; if (!mode) { seq = null; return; }
+    seq = { i: 0, t: now() + 1.5, beat: mode === 'major' ? 0.42 : 0.66, up: mode === 'major' ? 24 : 12, once: mode === 'major', g: mode === 'major' ? 0.11 : 0.08 }; };
+  M.onFrame(() => {
+    if (!ctx) return;
+    while (seq && seq.t < now() + 0.3) {
+      const [m, b] = SN[seq.i]; box(m + seq.up, seq.t, seq.g, musicIn);
+      if (seq.i % 3 === 0 && b >= 1) box(m + seq.up - 12, seq.t, seq.g * 0.45, musicIn);
+      seq.t += b * seq.beat; seq.i++;
+      if (seq.i >= SN.length) { if (seq.once) { seq = null; break; } seq.i = 0; seq.t += 4; }
+    }
+    const S = M.story, cold = S ? S.cold : 0.3, dawn = S ? S.dawn : 0;
+    const warmth = Math.max(dawn, Math.pow(M.clamp(1 - cold + (S && S.flame ? 0.15 : 0), 0, 1), 1.5));
+    musicLP.frequency.setTargetAtTime(900 + 7000 * warmth, now(), 1.0);
+    const G = M.girl, cd = G.pos.z > -44 ? (G.pos.x < 6 ? 6 - G.pos.x : G.pos.x > 14 ? G.pos.x - 14 : 0) : 99;
+    const lap = 0.6 + 0.4 * Math.sin(M.time * 0.9) * Math.sin(M.time * 0.37 + 1);
+    waterG.gain.setTargetAtTime(0.06 * M.smooth(9, 0.5, cd) * lap * (1 - dawn * 0.5), now(), 0.4);
+    waterF.frequency.setTargetAtTime(300 + 160 * Math.sin(M.time * 0.53), now(), 0.3);
+    wind.gain.setTargetAtTime((0.025 + cold * 0.07) * (1 - dawn * 0.8), now(), 0.5);
+    windF.frequency.setTargetAtTime(420 + Math.sin(M.time * 0.23) * 180 + Math.sin(M.time * 0.71) * 90, now(), 0.3);
+    if (fireOn) { const st = M.props.stove.pos, d = Math.hypot(M.girl.pos.x - st.x, M.girl.pos.z - st.z), k = M.smooth(12, 1.5, d);
+      fireG.gain.setTargetAtTime(0.1 * k, now(), 0.3);
+      if (Math.random() < 0.08 * k) burst(0.02, 'highpass', 2500 + Math.random() * 3000, 0.12 * k, -0.2 + Math.random() * 0.4); }
+    if (flameG.gain.value > 0.01 && Math.random() < 0.05) burst(0.015, 'highpass', 4000, 0.05);
+  }, 95);
+})();
+// ===== 14-ui-main.js：环境光、界面、开场、自适应质量、主循环 =====
+(() => {
+  const G = M.girl, $ = id => document.getElementById(id);
+  // ---- 月光 + 天光 ----
+  const moon = new T.DirectionalLight(M.col('#a9b9e6'), 0.75);
+  moon.castShadow = true; moon.shadow.mapSize.set(2048, 2048);
+  Object.assign(moon.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 90 });
+  moon.shadow.bias = -0.0006; moon.shadow.normalBias = 0.03;
+  M.scene.add(moon, moon.target);
+  const hemi = new T.HemisphereLight(M.col('#6a7aac'), M.col('#3a3540'), 0.9); M.scene.add(hemi);
+  M.env = { moon, hemi };
+  // 阴影相机按阴影贴图像素对齐，避免跟随移动时阴影边缘"爬动"闪烁
+  const lightRot = new T.Matrix4().lookAt(new T.Vector3(-14, 30, 12), new T.Vector3(0, 0, 0), new T.Vector3(0, 1, 0));
+  const lightInv = lightRot.clone().invert(), texel = 36 / 2048, sp = new T.Vector3();
+  M.onFrame(() => {
+    sp.copy(M.cam.target).setY(0).applyMatrix4(lightInv);
+    sp.x = Math.round(sp.x / texel) * texel; sp.y = Math.round(sp.y / texel) * texel;
+    sp.applyMatrix4(lightRot);
+    moon.position.set(sp.x - 14, sp.y + 30, sp.z + 12); moon.target.position.copy(sp); moon.target.updateMatrixWorld();
+  }, 75);
+
+  // ---- 界面 ----
+  let hintTimer = 0, capTimer = null;
+  M.ui = {
+    hint(text, soft) {
+      const h = $('hint'); if (h.textContent === text) return;
+      if (soft && performance.now() < hintTimer) return;
+      h.classList.add('hide'); setTimeout(() => { h.textContent = text; h.classList.remove('hide'); }, 350);
+      hintTimer = performance.now() + 6000;
+    },
+    caption(title, lines, dur = 6.5) {
+      const c = $('caption'), esc = s => s.replace(/</g, '&lt;');
+      c.querySelector('.t').innerHTML = `<span class="ln">${esc(title)}</span>`;
+      c.querySelector('.l').innerHTML = lines.map((l, i) => `<span class="ln" style="animation-delay:${0.35 + i * 0.75}s">${esc(l)}</span>`).join('');
+      c.classList.remove('hide'); clearTimeout(capTimer); capTimer = setTimeout(() => c.classList.add('hide'), dur * 1000);
+    },
+    hideCaption() { clearTimeout(capTimer); $('caption').classList.add('hide'); },
+    cinema(on) { document.body.classList.toggle('cine', !!on); },
+    action(label) {
+      const b = $('action');
+      if (!label) { b.classList.add('hide'); return; }
+      if (b.textContent !== label) b.textContent = label;
+      b.classList.remove('hide');
+    },
+    setMatches(n) { [...$('matches').children].forEach((el, i) => el.classList.toggle('used', i >= n)); },
+    setClock(s) { $('clock').textContent = s; },
+    ending() { $('hud').classList.add('hide'); M.ui.cinema(false); $('ending').classList.remove('hide'); },
+  };
+  $('action').addEventListener('click', () => M.story.strike());
+  $('again').addEventListener('click', () => location.reload());
+  const toggleMute = () => { const m = !M.audio.isMuted(); M.audio.setMuted(m); $('mute').classList.toggle('off', m); };
+  $('mute').addEventListener('click', toggleMute);
+  addEventListener('keydown', e => {
+    if (e.code === 'KeyM') toggleMute();
+    if (e.code === 'Space' && !$('action').classList.contains('hide')) { e.preventDefault(); M.story.strike(); }
+  });
+
+  // ---- 开场 ----
+  const q = new URLSearchParams(location.search);
+  M.cam.override = { target: new T.Vector3(3, 2, -8), dist: 34, yaw: 0, pitch: 0.55, rate: 1 };
+  M.cam.yaw = 0.3; M.cam.pitch = 0.55; M.cam.dist = 34; M.cam.target.set(3, 2, -8);
+  let introSpin = true;
+  M.onFrame(dt => { if (introSpin && M.cam.override) M.cam.override.yaw += dt * 0.04; }, 65);
+  const start = async () => {
+    M.audio.init();
+    $('intro').classList.add('hide'); $('hud').classList.remove('hide');
+    introSpin = false;
+    M.cam.focus({ target: new T.Vector3(G.pos.x, 0.9, G.pos.z), dist: 9, yaw: 0, pitch: 0.5, rate: 0.9 });
+    await M.wait(2.6);
+    M.cam.release(); M.cam.tYaw = 0; M.cam.tPitch = 0.5; M.cam.tDist = 9;
+    M.story.start();
+    if (q.has('debug')) { window.M = M; const n = +q.get('debug'); if (n > 0) M.debug.jump(n); }
+  };
+  $('start').addEventListener('click', start);
+  if (q.has('auto')) setTimeout(start, 300);
+
+  // ---- 尺寸与质量 ----
+  const resize = () => {
+    M.camera.aspect = innerWidth / innerHeight;
+    M.camera.fov = M.camera.aspect < 1 ? 50 + Math.min(1, (1 - M.camera.aspect) / 0.55) * 14 : 50;
+    M.camera.updateProjectionMatrix();
+    M.renderer.setSize(innerWidth, innerHeight); M.post.resize();
+  };
+  addEventListener('resize', resize); resize();
+  let fpsAcc = 0, fpsN = 0, good = 0;
+  const quality = dt => {
+    fpsAcc += dt; fpsN++;
+    if (fpsAcc < 1) return;
+    const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0;
+    if (fps < 40 && M.pixelScale > 0.6) { M.pixelScale = Math.max(0.6, M.pixelScale - 0.15); good = 0; }
+    else if (fps > 57 && M.pixelScale < 1) { if (++good >= 3) { M.pixelScale = Math.min(1, M.pixelScale + 0.1); good = 0; } else return; }
+    else return;
+    M.quality = M.pixelScale >= 0.9 ? 1 : M.pixelScale >= 0.7 ? 0.5 : 0.3;
+    M.setPixelRatio(); M.post.resize();
+  };
+
+  // ---- 主循环 ----
+  let last = performance.now(), first = true;
+  const loop = t => {
+    const dt = Math.min(0.05, (t - last) / 1000) * (M.timeScale ?? 1); last = t;
+    M.dt = dt; M.time += dt;
+    for (const f of M._frames) f.fn(dt);
+    M.post.render();
+    if (first) { first = false; const b = $('start'); b.disabled = false; b.textContent = '点亮第一根火柴'; }
+    quality(dt);
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>

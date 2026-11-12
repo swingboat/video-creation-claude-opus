@@ -1,0 +1,37 @@
+{
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "segments": [
+    {
+      "id": "hook",
+      "text": "为什么有的科研图一眼就懂，有的却越看越乱？"
+    },
+    {
+      "id": "object",
+      "text": "第一，物体。人一眼大约只记得住四个，主角别超过四个。",
+      "number": "4",
+      "cite": "Luck & Vogel, Nature, 1997"
+    },
+    {
+      "id": "line",
+      "text": "第二，连线。线非交叉不可，就让夹角接近九十度。",
+      "number": "90°",
+      "cite": "Huang, Hong & Eades, PacificVis, 2008"
+    },
+    {
+      "id": "space",
+      "text": "第三，空间。把曲线的平均坡度调到四十五度，趋势最好读。",
+      "number": "45°",
+      "cite": "Cleveland, McGill & McGill, JASA, 1988"
+    },
+    {
+      "id": "light",
+      "text": "第四，光。大脑默认光从左上方约二十六度照下来。",
+      "number": "26°",
+      "cite": "Mamassian & Goutcher, Cognition, 2001"
+    },
+    {
+      "id": "end",
+      "text": "好图，就是让眼睛少费力。"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+# ---- 视频文件（成片、参考片、预览）----
+*.mp4
+*.mov
+*.m4v
+*.webm
+*.mkv
+*.avi
+
+# ---- 可重建的构建产物与缓存 ----
+build/
+dist/
+out/
+.cache/
+cache/
+__pycache__/
+*.pyc
+*.blend1
+*.tmp
+reference/frames/
+
+# Tesseract：工程文件由 build.sh 生成，.tesseract-work 是中间目录
+*.tsrct
+.tesseract-work/
+
+# snow-white：素材由 npm run assets:fetch / assets:characters / audio 重新生成
+videos/*/public/assets/
+videos/*/public/models/
+videos/*/public/audio/final-mix.wav
+# 第三方素材原包（MakeHuman/MPFB 官方可下载，单个文件超过 GitHub 100 MB 上限）
+videos/*/assets-src/vendor/*.zip
+
+# ---- 依赖与环境（可通过包管理器恢复）----
+node_modules/
+.venv/
+venv/
+
+# ---- 测试与系统临时文件 ----
+.playwright-mcp/
+.DS_Store
+*.log

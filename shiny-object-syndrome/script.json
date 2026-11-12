@@ -1,0 +1,35 @@
+{
+  "title": "闪亮物体综合征：为什么新想法很多，完成的事很少",
+  "source": "ELI5 · 闪亮物体综合征（单文件互动笔记）；参考 APA《Multitasking: Switching costs》、UCF Business Incubation Program、Richard Dancsi《Shiny Objects Ruin Startups》",
+  "note": "挖井模型为人工教学规则（每口井 4 格出水、共 8 单位时间、换井多花 1 单位），不是研究测得的生产率数字。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "voices": {
+    "narr": { "name": "zh-CN-XiaoxiaoNeural" },
+    "liang": { "name": "zh-CN-YunxiNeural", "rate": 4 },
+    "shiny": { "name": "zh-CN-XiaoyiNeural", "rate": 6, "pitch": 12 }
+  },
+  "segments": [
+    { "id": "intro", "voice": "liang", "text": "今年，我一定要挖出一口有水的井！", "gap": 0.4 },
+    { "id": "meet", "voice": "narr", "text": "这是阿亮。他扛起铁锹，开始挖第一口井。一锹，两锹，越挖越深。", "gap": 0.35 },
+    { "id": "tempt1", "voice": "shiny", "text": "嘿！那边的土更软，一挖就出水哦！", "gap": 0.35 },
+    { "id": "swap1", "voice": "liang", "text": "真的？那我换个地方！", "gap": 0.55 },
+    { "id": "again", "voice": "narr", "text": "可新地方挖到一半，土又变硬了。这时，又一个亮闪闪的东西出现了。", "gap": 0.3 },
+    { "id": "tempt2", "voice": "shiny", "text": "来这儿！这里更好，更快！", "gap": 0.35 },
+    { "id": "swap2", "voice": "liang", "text": "有道理，再换！", "gap": 0.7 },
+    { "id": "result", "voice": "narr", "text": "就这样，地上多了三个半截的坑，一滴水也没有。", "gap": 0.8 },
+    { "id": "name", "voice": "narr", "text": "这就是人们常说的“闪亮物体综合征”：新鲜、看起来更有希望的东西，一次次把原本的目标挤到一边。", "captions": ["这就是人们常说的“闪亮物体综合征”", "新鲜、看起来更有希望的东西", "一次次把原本的目标挤到一边"], "gap": 0.5 },
+    { "id": "notdx", "voice": "narr", "text": "先说明，这只是对一种行为的通俗说法，不是医学诊断，别随便给自己贴标签。", "gap": 0.8 },
+    { "id": "real", "voice": "narr", "text": "现实里，闪亮的东西可能是：一门更火的新课，一款更酷的笔记软件，一个更热门的项目，或者一台更好的相机。", "gap": 0.8 },
+    { "id": "loop", "voice": "narr", "text": "它常常是一个循环：开始新东西，充满希望；做着做着，遇到普通的困难；这时，另一个选择显得更轻松；于是重新开始，旧事又被搁下。", "gap": 0.8 },
+    { "id": "math", "voice": "narr", "text": "我们来算笔账。假设每口井挖四格就出水，你一共有八个单位的时间。", "gap": 0.5 },
+    { "id": "focus", "voice": "narr", "text": "一直挖同一口，第四格就见水了，还剩一半时间。", "gap": 0.5 },
+    { "id": "hop", "voice": "narr", "text": "要是每挖两格就换，换一次还要多花一格时间。八个单位用完，三口井都只挖到一半。", "gap": 0.9 },
+    { "id": "butok", "voice": "narr", "text": "不过，换井不一定是错的。如果有证据说明这里根本没水，继续挖才是固执。已经花掉的时间，也不是非坚持不可的理由。", "gap": 0.8 },
+    { "id": "ask", "voice": "narr", "text": "所以，新东西出现时，先问自己三个问题：它服务我的哪个目标？能解决我现在的什么卡点？我有什么证据？", "gap": 0.8 },
+    { "id": "ticket", "voice": "narr", "text": "答案还不清楚？那就给它一张停车票：写下它是什么、为什么有用、什么时候再看，然后接着挖。", "gap": 0.4 },
+    { "id": "shinyOk", "voice": "shiny", "text": "好吧，我在停车场等你！", "gap": 0.7 },
+    { "id": "trial", "voice": "narr", "text": "真想试试？就做个小试验：定好时间预算，只验证一个问题。到了检查点，再决定是继续，还是改向。", "gap": 1.9 },
+    { "id": "water", "voice": "liang", "text": "出水啦！", "gap": 0.6 },
+    { "id": "outro", "voice": "narr", "text": "好奇心可以留着，主线别弄丢。好想法，可以晚一点开始。", "gap": 0.2 }
+  ]
+}

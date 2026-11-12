@@ -1,0 +1,36 @@
+{
+  "name": "snow-white-creek-rescue",
+  "version": "1.0.0",
+  "private": true,
+  "description": "白雪公主与七个小矮人：溪谷救援 — Three.js + Remotion 叙事短片",
+  "type": "module",
+  "scripts": {
+    "preview": "remotion studio src/index.ts",
+    "studio": "remotion studio src/index.ts",
+    "still": "node scripts/render.mjs still",
+    "stills": "node scripts/gen-stills.mjs",
+    "clip": "node scripts/render.mjs clip",
+    "render": "node scripts/render.mjs full",
+    "audio": "node scripts/gen-audio.mjs",
+    "typecheck": "tsc --noEmit",
+    "assets:fetch": "node scripts/fetch-assets.mjs",
+    "assets:characters": "BLENDER_USER_RESOURCES=$PWD/.cache/blender TMPDIR=$PWD/.cache/tmp blender -b --factory-startup --python assets-src/blender/build_characters.py -- --preview",
+    "assets:fawn": "BLENDER_USER_RESOURCES=$PWD/.cache/blender TMPDIR=$PWD/.cache/tmp blender -b --factory-startup --python assets-src/blender/build_fawn.py -- --preview",
+    "assets:trees": "BLENDER_USER_RESOURCES=$PWD/.cache/blender TMPDIR=$PWD/.cache/tmp blender -b --factory-startup --python assets-src/blender/decimate_trees.py"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.536",
+    "@remotion/cli": "4.0.536",
+    "@remotion/renderer": "4.0.536",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.536",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.2",
+    "@types/three": "0.186.0",
+    "typescript": "5.9.3"
+  }
+}

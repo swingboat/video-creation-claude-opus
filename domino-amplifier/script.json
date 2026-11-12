@@ -1,0 +1,45 @@
+{
+  "title": "多米诺放大器",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "voices": {
+    "zh": {
+      "name": "zh-CN-XiaoxiaoNeural"
+    }
+  },
+  "sources": [
+    "Lorne A. Whitehead, \"Domino 'chain reaction'\", American Journal of Physics 51, 182 (1983)",
+    "Empire State Building: roof 381 m, tip 443 m"
+  ],
+  "numbers": {
+    "first_mm": 5,
+    "growth": 1.5,
+    "d13_ratio": "1.5^12 ≈ 130",
+    "d13_cm": "0.5 cm × 1.5^12 ≈ 65 cm",
+    "d29_m": "0.5 cm × 1.5^28 ≈ 426 m"
+  },
+  "segments": [
+    {
+      "id": "hook",
+      "text": "轻轻一碰，能推倒一座摩天楼吗？",
+      "gap": 0.6
+    },
+    {
+      "id": "fact",
+      "text": "1983年，物理学家怀特黑德发现：一块多米诺骨牌，能推倒比它大一半的骨牌。",
+      "captions": ["1983年，物理学家怀特黑德发现", "一块多米诺骨牌", "能推倒比它大一半的骨牌"]
+    },
+    {
+      "id": "why",
+      "text": "因为立着的骨牌存着重力势能，一碰就全部释放出来。"
+    },
+    {
+      "id": "grow",
+      "text": "每块放大一点五倍，第十三块已经是第一块的一百三十倍。",
+      "gap": 0.7
+    },
+    {
+      "id": "tower",
+      "text": "照这样摆下去，第二十九块就有四百多米，比帝国大厦楼顶还高！"
+    }
+  ]
+}

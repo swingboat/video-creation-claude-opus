@@ -1,0 +1,5 @@
+node_modules/
+.cache/
+*.log
+.DS_Store
+# Keep final renders and check artifacts in out/ and checks/ as deliverables.

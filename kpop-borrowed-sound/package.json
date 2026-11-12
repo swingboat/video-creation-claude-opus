@@ -1,0 +1,9 @@
+{
+  "name": "kpop-borrowed-sound",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.11"
+  }
+}

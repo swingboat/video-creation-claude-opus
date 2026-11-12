@@ -1,0 +1,41 @@
+{
+  "title": "电磁波-抖音竖屏版",
+  "source": "ELI5 图解《电磁波 · 光与无线信号的共同语言》；资料：OpenStax Plane Electromagnetic Waves、NASA Anatomy of an Electromagnetic Wave、NASA The Electromagnetic Spectrum、NIST SI 定义常数（c = 299 792 458 m/s）",
+  "numbers": {
+    "c": "299 792 458 m/s ≈ 每秒 30 万千米；一秒绕地球约 7.5 圈（赤道周长 40 075 km）",
+    "300MHz": "λ = c / f ≈ 1.0 m；600 MHz → 0.50 m",
+    "photon": "E光子 = hf"
+  },
+  "rate": 6,
+  "voices": {
+    "zh": { "name": "zh-CN-XiaoxiaoNeural" },
+    "kid": { "name": "zh-CN-YunxiaNeural", "rate": 4, "pitch": 6 }
+  },
+  "segments": [
+    { "id": "hook", "voice": "kid", "text": "阳光、WiFi、医院的X光，居然是一家人？", "captions": ["阳光、WiFi、医院的X光，", "居然是一家人？"], "gap": 0.3 },
+    { "id": "yes", "text": "没错！它们都是电磁波，只是频率不同。", "captions": ["没错！", "它们都是电磁波，", "只是频率不同。"], "gap": 0.5 },
+
+    { "id": "make", "text": "天线里的电荷来回一晃，电场和磁场就跟着变，一个带一个，往外跑！", "captions": ["天线里的电荷来回一晃，", "电场和磁场就跟着变，", "一个带一个，往外跑！"], "gap": 0.3 },
+    { "id": "perp", "text": "电场上下振，磁场左右振，同起同落，都垂直于前进方向。", "captions": ["电场上下振，", "磁场左右振，", "同起同落，", "都垂直于前进方向。"], "gap": 0.5 },
+
+    { "id": "kidAir", "voice": "kid", "text": "那它要靠空气传吗？", "gap": 0.25 },
+    { "id": "vacuum", "text": "不用！太空几乎是真空，阳光照样能到。", "captions": ["不用！", "太空几乎是真空，", "阳光照样能到。"], "gap": 0.3 },
+    { "id": "speed", "text": "而且它每秒跑30万千米，一秒能绕地球七圈半！", "captions": ["而且它每秒跑30万千米，", "一秒能绕地球七圈半！"], "gap": 0.5 },
+
+    { "id": "freq", "text": "原地每秒振几次，叫频率；", "gap": 0.2 },
+    { "id": "lambda", "text": "相邻波峰隔多远，叫波长。", "gap": 0.3 },
+    { "id": "formula", "text": "波长乘频率，等于光速。", "gap": 0.3 },
+    { "id": "double", "text": "所以频率翻倍，速度不变，波长减半！", "captions": ["所以频率翻倍，", "速度不变，波长减半！"], "gap": 0.5 },
+
+    { "id": "lineup", "text": "按频率从低到高排排站：", "gap": 0.2 },
+    { "id": "members", "text": "无线电波、微波、红外线、可见光、紫外线、X射线、伽马射线。", "captions": ["无线电波、微波、红外线、", "可见光、紫外线、", "X射线、伽马射线。"], "gap": 0.3 },
+    { "id": "uses", "text": "广播、WiFi、遥控器和X光片，全是它们在干活。", "captions": ["广播、WiFi、遥控器和X光片，", "全是它们在干活。"], "gap": 0.3 },
+    { "id": "visible", "text": "而我们眼睛能看见的，只有中间窄窄一小段！", "captions": ["而我们眼睛能看见的，", "只有中间窄窄一小段！"], "gap": 0.5 },
+
+    { "id": "kidEnergy", "voice": "kid", "text": "那频率越高，能量越大吗？", "gap": 0.25 },
+    { "id": "photon", "text": "单个光子是这样；但一整束波的总能量，还要看强度和时间。", "captions": ["单个光子是这样；", "但一整束波的总能量，", "还要看强度和时间。"], "gap": 0.5 },
+
+    { "id": "outro", "text": "所以此刻，你就泡在电磁波里！", "captions": ["所以此刻，", "你就泡在电磁波里！"], "gap": 0.3 },
+    { "id": "cta", "text": "你还知道哪些电磁波？评论区告诉我！", "captions": ["你还知道哪些电磁波？", "评论区告诉我！"] }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "voice": "zh-CN-XiaoyiNeural",
+  "voices": {
+    "zh": {
+      "name": "zh-CN-XiaoyiNeural"
+    },
+    "en": {
+      "name": "en-US-EmmaNeural",
+      "rate": -12
+    },
+    "king": {
+      "name": "en-GB-RyanNeural",
+      "rate": -10,
+      "pitch": -12
+    }
+  },
+  "segments": [
+    {
+      "id": "hook",
+      "text": "有个英文单词，里面偷偷藏着一位皇帝！",
+      "gap": 0.6
+    },
+    {
+      "id": "say1",
+      "voice": "en",
+      "text": "Imperative.",
+      "gap": 0.7
+    },
+    {
+      "id": "stress",
+      "text": "重音落在第二个音节，跟我再读一遍。",
+      "gap": 0.45
+    },
+    {
+      "id": "say2",
+      "voice": "en",
+      "text": "Imperative.",
+      "gap": 1.2
+    },
+    {
+      "id": "reveal",
+      "text": "把开头这几个字母圈出来，像不像另一个词？",
+      "gap": 0.5
+    },
+    {
+      "id": "emperor",
+      "voice": "en",
+      "text": "Emperor.",
+      "zh": "皇帝",
+      "gap": 0.5
+    },
+    {
+      "id": "family",
+      "text": "对，皇帝！它们是一家人，都来自拉丁语，意思是：下令。",
+      "gap": 1.1
+    },
+    {
+      "id": "cmdLead",
+      "text": "皇帝一开口：",
+      "gap": 0.35
+    },
+    {
+      "id": "cmd",
+      "voice": "king",
+      "text": "Close the door!",
+      "zh": "关上门！",
+      "gap": 1.3
+    },
+    {
+      "id": "cmdExplain",
+      "text": "这种直接叫人去做的句子，就叫祈使句。",
+      "gap": 1.0
+    },
+    {
+      "id": "must",
+      "text": "皇帝的命令，谁敢不做？所以它还表示：必须的，非做不可！",
+      "gap": 1.15,
+      "captions": [
+        "皇帝的命令，谁敢不做？",
+        "所以它还表示：",
+        "必须的，非做不可！"
+      ]
+    },
+    {
+      "id": "exAdj",
+      "voice": "en",
+      "text": "It is imperative to save your work.",
+      "zh": "务必保存好你的工作。",
+      "gap": 1.1
+    },
+    {
+      "id": "noun",
+      "text": "当名词用，它就是一件必须做的事。",
+      "gap": 0.45
+    },
+    {
+      "id": "exNoun",
+      "voice": "en",
+      "text": "Honesty is a moral imperative.",
+      "zh": "诚实，是道义上必须做到的事。",
+      "gap": 1.2
+    },
+    {
+      "id": "trap",
+      "text": "小心！开头的 I M 在这里不是“不”。它可不是不重要，而是超级重要！",
+      "gap": 1.1,
+      "captions": [
+        "小心！",
+        "开头的 I M 在这里",
+        "不是“不”。",
+        "它可不是不重要，",
+        "而是超级重要！"
+      ]
+    },
+    {
+      "id": "recap",
+      "text": "记住这位皇帝：语法里，是请你去做；生活里，是必须去做。",
+      "gap": 0.6,
+      "captions": [
+        "记住这位皇帝：",
+        "语法里，是请你去做；",
+        "生活里，是必须去做。"
+      ]
+    },
+    {
+      "id": "outro",
+      "voice": "king",
+      "text": "Imperative!",
+      "zh": "必须做！"
+    }
+  ]
+}
